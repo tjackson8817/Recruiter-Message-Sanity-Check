@@ -1,0 +1,1016 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Case File: Recruiter Message Check</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=IBM+Plex+Mono:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --paper: #EDE6D2;
+    --paper-dark: #E1D5B8;
+    --paper-shadow: #cbbd98;
+    --ink: #26221E;
+    --ink-soft: #5B5347;
+    --rule: #C9BC9C;
+    --red: #9C3B2C;
+    --red-soft: #F0DAD2;
+    --amber: #A6742E;
+    --amber-soft: #F1E3C4;
+    --green: #3E6B52;
+    --green-soft: #DCE7DC;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.15), transparent 60%),
+      var(--paper);
+    color:var(--ink);
+    font-family:'Source Serif 4', serif;
+    min-height:100vh;
+    padding:28px 16px 60px;
+  }
+  .wrap{max-width:1080px;margin:0 auto;}
+
+  .folder-tab{
+    display:inline-block;
+    background:var(--ink);
+    color:var(--paper);
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.14em;
+    padding:6px 16px;
+    border-radius:3px 3px 0 0;
+    transform:translateY(1px);
+  }
+  header{
+    border-bottom:3px double var(--ink);
+    padding-bottom:16px;
+    margin-bottom:22px;
+  }
+  h1{
+    font-family:'Special Elite', monospace;
+    font-size:clamp(26px,4vw,38px);
+    margin:6px 0 4px;
+    letter-spacing:0.01em;
+  }
+  .sub{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    letter-spacing:0.03em;
+  }
+  .case-no{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    float:right;
+    text-align:right;
+    line-height:1.6;
+  }
+
+  .examples-row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin-bottom:18px;
+    align-items:center;
+  }
+  .examples-row span{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    margin-right:2px;
+  }
+  .chip-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    background:transparent;
+    border:1px solid var(--ink-soft);
+    color:var(--ink-soft);
+    padding:5px 10px;
+    border-radius:20px;
+    cursor:pointer;
+  }
+  .chip-btn:hover{background:var(--ink-soft); color:var(--paper);}
+
+  .grid{
+    display:grid;
+    grid-template-columns: 1.05fr 0.95fr;
+    gap:22px;
+    align-items:start;
+  }
+  @media (max-width:860px){ .grid{grid-template-columns:1fr;} }
+
+  .panel{
+    background:var(--paper-dark);
+    border:1px solid var(--rule);
+    border-radius:2px;
+    padding:20px 22px;
+    box-shadow: 3px 3px 0 var(--paper-shadow);
+    position:relative;
+  }
+  .panel h2{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin:0 0 12px;
+    padding-bottom:8px;
+    border-bottom:1px dashed var(--rule);
+  }
+
+  textarea{
+    width:100%;
+    min-height:200px;
+    resize:vertical;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    line-height:1.55;
+    padding:12px;
+    border:1px solid var(--rule);
+    background:#F7F2E4;
+    color:var(--ink);
+    border-radius:2px;
+  }
+  textarea:focus{outline:2px solid var(--ink-soft); outline-offset:1px;}
+
+  .field-row{margin-bottom:14px;}
+  .two-col{display:grid; grid-template-columns:1fr 1fr; gap:12px;}
+  @media (max-width:520px){ .two-col{grid-template-columns:1fr;} }
+  label.field-label{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-bottom:5px;
+    letter-spacing:0.03em;
+  }
+  input[type="text"]{
+    width:100%;
+    font-family:'Source Serif 4',serif;
+    font-size:14px;
+    padding:8px 10px;
+    border:1px solid var(--rule);
+    background:#F7F2E4;
+    color:var(--ink);
+    border-radius:2px;
+  }
+  input[type="text"]:focus{outline:2px solid var(--ink-soft); outline-offset:1px;}
+
+  fieldset{
+    border:1px dashed var(--rule);
+    border-radius:2px;
+    padding:12px 14px 6px;
+    margin:0 0 16px;
+  }
+  legend{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    padding:0 6px;
+    letter-spacing:0.03em;
+  }
+  .checkbox-row{
+    display:flex;
+    align-items:flex-start;
+    gap:9px;
+    padding:6px 0;
+    font-size:13.5px;
+    line-height:1.4;
+  }
+  .checkbox-row input{margin-top:3px; accent-color:var(--red);}
+  .checkbox-row label{cursor:pointer;}
+
+  .custom-add-row{display:flex; gap:8px; margin-bottom:8px;}
+  .custom-add-row input{flex:1;}
+  .add-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    background:var(--ink-soft);
+    color:var(--paper);
+    border:none;
+    padding:0 14px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+  .custom-chip-list{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:6px;}
+  .custom-chip{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    background:#F7F2E4;
+    border:1px solid var(--rule);
+    padding:4px 8px;
+    border-radius:14px;
+    display:flex;
+    align-items:center;
+    gap:6px;
+  }
+  .custom-chip button{
+    border:none;
+    background:none;
+    color:var(--red);
+    cursor:pointer;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    padding:0;
+    line-height:1;
+  }
+
+  button.analyze{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:13px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    background:var(--ink);
+    color:var(--paper);
+    border:none;
+    padding:12px 22px;
+    border-radius:2px;
+    cursor:pointer;
+    width:100%;
+    margin-top:4px;
+    transition:transform .1s ease, background .15s ease;
+  }
+  button.analyze:hover{background:#3a342d;}
+  button.analyze:active{transform:translateY(1px);}
+
+  .hint{font-family:'IBM Plex Mono',monospace;font-size:10.5px;color:var(--ink-soft);margin-top:8px;line-height:1.5;}
+
+  /* --- Report side --- */
+  .empty-state{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    color:var(--ink-soft);
+    padding:30px 4px;
+    text-align:center;
+    line-height:1.8;
+  }
+
+  .report-actions{
+    display:flex;
+    gap:8px;
+    justify-content:flex-end;
+    margin-bottom:10px;
+  }
+  .icon-btn{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    background:transparent;
+    border:1px solid var(--rule);
+    color:var(--ink-soft);
+    padding:6px 10px;
+    border-radius:2px;
+    cursor:pointer;
+  }
+  .icon-btn:hover{border-color:var(--ink-soft); color:var(--ink);}
+
+  .stamp-zone{
+    position:relative;
+    min-height:90px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    margin-bottom:10px;
+  }
+  .stamp{
+    font-family:'Special Elite', monospace;
+    font-size:22px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:12px 22px;
+    border:4px double currentColor;
+    border-radius:6px;
+    transform:rotate(-4deg);
+    display:inline-block;
+    opacity:0.92;
+    text-align:center;
+  }
+  .stamp.red{color:var(--red);}
+  .stamp.amber{color:var(--amber);}
+  .stamp.green{color:var(--green);}
+
+  .score-line{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-bottom:6px;
+  }
+  .score-caption{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10px;
+    color:var(--ink-soft);
+    text-align:center;
+    margin-bottom:14px;
+    opacity:0.85;
+  }
+  .score-bar-track{
+    height:8px;
+    background:#00000014;
+    border-radius:4px;
+    overflow:hidden;
+    margin:6px auto 0;
+    max-width:280px;
+  }
+  .score-bar-fill{height:100%; border-radius:4px; transition:width .4s ease;}
+
+  .flag-list{list-style:none;margin:0;padding:0;}
+  .flag-item{
+    display:flex;
+    gap:10px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--rule);
+  }
+  .flag-item:last-child{border-bottom:none;}
+  .flag-sev{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:9.5px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    padding:2px 6px;
+    border-radius:3px;
+    height:fit-content;
+    white-space:nowrap;
+    margin-top:2px;
+  }
+  .flag-sev.high{background:var(--red-soft); color:var(--red);}
+  .flag-sev.med{background:var(--amber-soft); color:var(--amber);}
+  .flag-sev.low{background:var(--green-soft); color:var(--green);}
+  .flag-text{font-size:13.5px; line-height:1.5;}
+  .flag-why{
+    display:block;
+    font-size:12px;
+    color:var(--ink-soft);
+    font-style:italic;
+    margin-top:2px;
+  }
+  .flag-quote{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11.5px;
+    color:var(--ink-soft);
+    margin-top:3px;
+    padding-left:8px;
+    border-left:2px solid var(--rule);
+  }
+
+  .annotated-box{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px dashed var(--rule);
+  }
+  .annotated-text{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    line-height:1.8;
+    white-space:pre-wrap;
+    max-height:260px;
+    overflow-y:auto;
+    padding:12px;
+    background:#F7F2E4;
+    border:1px solid var(--rule);
+    border-radius:2px;
+  }
+  mark.hi-high{background:#E9C3B9; color:var(--red); padding:0 2px; border-radius:2px;}
+  mark.hi-med{background:#EFDDA8; color:var(--amber); padding:0 2px; border-radius:2px;}
+
+  .no-flags{
+    font-size:13.5px;
+    color:var(--ink-soft);
+    line-height:1.6;
+  }
+
+  .report-links{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px dashed var(--rule);
+  }
+  .report-links a{
+    display:block;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    color:var(--ink);
+    text-decoration:none;
+    padding:6px 0;
+    border-bottom:1px dotted var(--rule);
+  }
+  .report-links a:hover{color:var(--red);}
+  .report-links a:last-child{border-bottom:none;}
+
+  .history-panel{
+    margin-top:22px;
+  }
+  .history-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12px;
+    padding:8px 0;
+    border-bottom:1px dashed var(--rule);
+    gap:10px;
+  }
+  .history-item:last-child{border-bottom:none;}
+  .history-meta{color:var(--ink-soft); font-size:11px;}
+  .history-badge{
+    padding:2px 7px;
+    border-radius:3px;
+    font-size:10px;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+  .history-badge.red{background:var(--red-soft); color:var(--red);}
+  .history-badge.amber{background:var(--amber-soft); color:var(--amber);}
+  .history-badge.green{background:var(--green-soft); color:var(--green);}
+  .history-empty{font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--ink-soft);}
+  .clear-history{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    background:none;
+    border:none;
+    text-decoration:underline;
+    cursor:pointer;
+    padding:0;
+  }
+  .history-actions{
+    display:flex;
+    align-items:center;
+    gap:14px;
+    flex-wrap:wrap;
+    margin-top:10px;
+  }
+  label.icon-btn{display:inline-block;}
+
+  footer.note{
+    max-width:1080px;
+    margin:26px auto 0;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    line-height:1.7;
+    border-top:1px dashed var(--rule);
+    padding-top:14px;
+  }
+
+  @media print{
+    .panel:first-child, .examples-row, footer.note, .report-actions, button{display:none !important;}
+    body{background:#fff;}
+    .panel{box-shadow:none; border:none;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div class="folder-tab">EVIDENCE FOLDER</div>
+    <span class="case-no">FORM RM-1<br>Sanity check, not a verdict</span>
+    <h1>Recruiter Message Sanity Check</h1>
+    <div class="sub">Paste the InMail or message below. This flags known scam patterns — it doesn't prove someone is fake, and a clean result doesn't prove someone is real.</div>
+  </header>
+
+  <div class="examples-row">
+    <span>Try a sample:</span>
+    <button class="chip-btn" data-ex="0">Vague title / WhatsApp handoff</button>
+    <button class="chip-btn" data-ex="1">Upfront equipment fee</button>
+    <button class="chip-btn" data-ex="2">Ordinary, low-flag message</button>
+  </div>
+
+  <div class="grid">
+
+    <!-- LEFT: INPUT -->
+    <div class="panel">
+      <h2>Exhibit A — The Message</h2>
+
+      <div class="field-row">
+        <label class="field-label" for="msgText">Paste the message text</label>
+        <textarea id="msgText" placeholder="Dear Thomas, I recently reviewed your background..."></textarea>
+      </div>
+
+      <div class="two-col field-row">
+        <div>
+          <label class="field-label" for="companyName">Company they claim to represent</label>
+          <input type="text" id="companyName" placeholder="e.g. Schneider Electric">
+        </div>
+        <div>
+          <label class="field-label" for="senderEmail">Sender's email (if given)</label>
+          <input type="text" id="senderEmail" placeholder="e.g. b.hakes@se.com">
+        </div>
+      </div>
+
+      <fieldset>
+        <legend>Profile signals — check what applies</legend>
+        <div id="checklist"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your own red flags (optional)</legend>
+        <div class="custom-add-row">
+          <input type="text" id="customPhraseInput" placeholder="Add a phrase you've seen in scam messages">
+          <button class="add-btn" id="addCustomBtn">Add</button>
+        </div>
+        <div class="custom-chip-list" id="customChipList"></div>
+        <div class="hint" style="margin-top:0;">These are checked in addition to the built-in list, for this session only.</div>
+      </fieldset>
+
+      <button class="analyze" id="analyzeBtn">Run the check</button>
+      <div class="hint">Nothing you enter here leaves your browser. The check runs locally against a fixed list of known scam patterns.</div>
+    </div>
+
+    <!-- RIGHT: REPORT -->
+    <div class="panel" id="reportPanel">
+      <h2>Findings</h2>
+      <div class="empty-state" id="emptyState">
+        Paste a message and run the check.<br>The verdict and flagged phrases will appear here.
+      </div>
+      <div id="reportBody" style="display:none;">
+        <div class="report-actions">
+          <button class="icon-btn" id="copyBtn">Copy report</button>
+          <button class="icon-btn" id="printBtn">Print / Save as PDF</button>
+        </div>
+
+        <div class="stamp-zone">
+          <div class="stamp" id="stampEl">—</div>
+        </div>
+        <div class="score-line" id="scoreLine"></div>
+        <div class="score-caption">Pattern match strength — how much this message overlaps with known scam wording, not a probability of fraud</div>
+        <div class="score-bar-track"><div class="score-bar-fill" id="scoreBar"></div></div>
+
+        <ul class="flag-list" id="flagList" style="margin-top:18px;"></ul>
+
+        <div class="report-links" id="reportLinks" style="display:none;">
+          <label class="field-label" style="margin-bottom:8px;">If this looks like a scam, report it</label>
+          <a href="https://www.linkedin.com/help/linkedin/ask/TS-RSF" target="_blank" rel="noopener">Report a fake profile or message on LinkedIn</a>
+          <a href="https://www.ic3.gov/" target="_blank" rel="noopener">File a report with the FBI's Internet Crime Complaint Center (IC3)</a>
+          <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">Report it to the FTC at ReportFraud.ftc.gov</a>
+        </div>
+
+        <div class="annotated-box">
+          <label class="field-label" style="margin-bottom:8px;">Message with flagged phrases marked</label>
+          <div class="annotated-text" id="annotatedText"></div>
+        </div>
+      </div>
+
+      <div class="history-panel">
+        <h2>Past checks (this session)</h2>
+        <div id="historyList"><div class="history-empty">No past checks yet.</div></div>
+        <div class="history-actions">
+          <button class="icon-btn" id="downloadHistoryBtn" style="display:none;">Download history (.json)</button>
+          <label class="icon-btn" for="loadHistoryInput" style="display:none;" id="loadHistoryLabel">Load history file</label>
+          <input type="file" id="loadHistoryInput" accept="application/json" style="display:none;">
+          <button class="clear-history" id="clearHistoryBtn" style="display:none;">Clear history</button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <footer class="note">
+    This tool checks for wording and behavior patterns common in fake recruiter scams — it does not verify anyone's real identity or employer. For that, check the company's own careers page for a matching role, look up the sender on the company's official site, and be wary of any recruiting process that moves to WhatsApp/Telegram or asks for money, bank details, or ID documents before an offer. History lasts only for this browser session unless you download it — nothing is sent anywhere, and nothing is saved automatically.
+  </footer>
+
+</div>
+
+<script>
+// ---------- Sample messages ----------
+const examples = [
+  {
+    company: 'Schneider Electric',
+    email: '',
+    text: `Dear Thomas,\n\nI recently reviewed your background and was impressed by your extensive leadership in operational technology cybersecurity. Schneider Electric is conducting interview-based discussions with experienced cybersecurity leaders for strategic opportunities. At this stage, the title is under discussion, the business unit is under discussion, and the compensation package is under discussion.\n\nIf this opportunity is of interest, please reply with your preferred email address and phone number. Our Project Lead, Tanya, will share additional details.\n\nWe primarily communicate with global talent regarding this project via WhatsApp. If convenient, you may also connect with the project manager via WhatsApp: +1 (215) 391-3221.\n\nBest regards,\nBenjamin Hakes\nSenior Recruitment Specialist`
+  },
+  {
+    company: 'Global Freight Solutions',
+    email: 'hr.dept@gmail.com',
+    text: `Hello,\n\nCongratulations! You have been selected for a remote logistics coordinator role paying $85/hour. To get started immediately, you will need to purchase your own equipment (laptop and scanner) and we will reimburse you after your first week. Please send a $250 processing fee to activate your account and reply with your bank account details for direct deposit setup.\n\nAct fast, we only have 2 slots left this week.\n\nRegards,\nHR Department`
+  },
+  {
+    company: 'Acme Analytics',
+    email: 'r.chen@acmeanalytics.com',
+    text: `Hi Sam,\n\nI'm a recruiter at Acme Analytics working on our Senior Data Engineer opening (req #4471) on the Platform team. Your experience with distributed systems stood out. The role is based in Austin with a hybrid schedule, targeting $150-170k base depending on experience.\n\nWould you be open to a 20-minute call this week? Happy to work around your schedule and can send over the full job description beforehand.\n\nBest,\nRiley Chen\nTechnical Recruiter, Acme Analytics`
+  }
+];
+
+document.querySelectorAll('.chip-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    const ex = examples[btn.dataset.ex];
+    document.getElementById('msgText').value = ex.text;
+    document.getElementById('companyName').value = ex.company;
+    document.getElementById('senderEmail').value = ex.email;
+  });
+});
+
+// ---------- Checklist definition ----------
+const profileChecks = [
+  { id:'newProfile', label:'Profile was created recently (within the last 6 months)', weight:10 },
+  { id:'fewConnections', label:'Fewer than ~50 connections', weight:10 },
+  { id:'noBadge', label:'No verification badge (ID, employer, or Clear/Entra verification)', weight:5 },
+  { id:'stockPhoto', label:'Reverse image search shows the photo used elsewhere / on a stock site', weight:25 },
+  { id:'notListed', label:'Not listed as an employee on the company\u2019s own LinkedIn page', weight:25 },
+  { id:'noMutuals', label:'Few or no mutual connections in your industry', weight:8 },
+  { id:'noActivity', label:'Little to no posting or comment history', weight:7 },
+];
+
+const checklistEl = document.getElementById('checklist');
+profileChecks.forEach(c => {
+  const row = document.createElement('div');
+  row.className = 'checkbox-row';
+  row.innerHTML = `<input type="checkbox" id="${c.id}"><label for="${c.id}">${c.label}</label>`;
+  checklistEl.appendChild(row);
+});
+
+// ---------- Text pattern definitions ----------
+const patterns = [
+  {
+    id:'offPlatform', label:'Pushes the conversation to WhatsApp, Telegram, Signal, or a similar app',
+    why:'Legitimate corporate recruiters use company email and internal scheduling tools, not consumer messaging apps.',
+    severity:'high', weight:20,
+    regex:/\b(whatsapp|telegram|signal app|wechat)\b/gi
+  },
+  {
+    id:'vagueTerms', label:'Title, team, or pay is left vague or "under discussion"',
+    why:'A real requisition usually has at least a working title and team locked down before outreach begins.',
+    severity:'med', weight:15,
+    regex:/\b(under discussion|to be discussed|tbd|title is still|compensation (?:is|will be) (?:under discussion|discussed))\b/gi
+  },
+  {
+    id:'earlyContactAsk', label:'Asks for your personal email and phone number right away, before any formal process',
+    why:'This is often the first step in moving you off LinkedIn to a channel that\u2019s harder to trace.',
+    severity:'med', weight:12,
+    regex:/reply with your (?:preferred )?(?:email|phone|contact)/gi
+  },
+  {
+    id:'urgency', label:'Uses pressure or urgency language',
+    why:'Urgency is used to short-circuit the careful checking a real offer can withstand.',
+    severity:'low', weight:8,
+    regex:/\b(act (?:now|fast)|immediately|urgent(?:ly)?|limited (?:spots|time|slots)|don't miss|only a few (?:spots|days))\b/gi
+  },
+  {
+    id:'feeRequest', label:'Mentions a fee, deposit, or purchase you\u2019d need to make',
+    why:'Legitimate employers never charge candidates for equipment, training, or onboarding.',
+    severity:'high', weight:30,
+    regex:/\b(processing fee|registration fee|training fee|deposit required|purchase (?:your own )?equipment|shipping fee|activation fee)\b/gi
+  },
+  {
+    id:'financialInfo', label:'Asks for banking details, SSN, or ID documents at this early stage',
+    why:'Real employers collect this only after a signed offer, through secure onboarding systems, not chat.',
+    severity:'high', weight:30,
+    regex:/\b(bank account|routing number|social security|ssn|wire transfer|bank details|passport (?:number|copy))\b/gi
+  },
+  {
+    id:'genericFlattery', label:'Uses generic, copy-pasted-sounding flattery about your background',
+    why:'Scam messages are often templated across hundreds of targets, so the compliment stays vague.',
+    severity:'low', weight:5,
+    regex:/\b(impressed by your (?:extensive|background)|your background caught our (?:attention|eye)|reviewed your (?:profile|background) and (?:was|were) impressed)\b/gi
+  },
+  {
+    id:'genericOpportunity', label:'Describes the role only in vague, generic terms without a req ID or specific team',
+    why:'Real openings usually reference a specific team, manager, or requisition number.',
+    severity:'low', weight:5,
+    regex:/\b(strategic opportunit(?:y|ies)|exciting opportunity|exceptional opportunity)\b/gi
+  },
+  {
+    id:'goBetween', label:'Hands you off to a second "project lead" or "project manager" instead of a named in-house recruiter',
+    why:'Adding an extra, harder-to-verify intermediary is a common scam structure.',
+    severity:'med', weight:8,
+    regex:/\b(project lead|project manager) will (?:share|contact|reach out|provide)/gi
+  },
+  {
+    id:'appDownload', label:'Asks you to download an app or software to proceed',
+    why:'This can be a vector for malware or a fake onboarding portal built to harvest your data.',
+    severity:'high', weight:20,
+    regex:/\b(download (?:the|our|this) app|install (?:the|our) (?:app|software))\b/gi
+  },
+  {
+    id:'crypto', label:'Mentions cryptocurrency, trading, or investment as part of the role or payment',
+    why:'Crypto-linked "recruiting" is a well-documented scam pattern, often layered on top of a fake job offer.',
+    severity:'high', weight:20,
+    regex:/\b(crypto(?:currency)?|bitcoin|usdt|trading (?:platform|account)|invest(?:ment)? (?:account|opportunity))\b/gi
+  },
+  {
+    id:'tooGoodPay', label:'Advertises unusually high pay for the effort described',
+    why:'Inflated pay is a common lure; if it looks too good, verify independently before engaging further.',
+    severity:'med', weight:15,
+    regex:/\$\s?\d{2,}(?:,\d{3})*\s?(?:\/|per\s)(?:hour|hr|day|week)\b/gi
+  },
+  {
+    id:'freeEmailAsk', label:'Sender is communicating from, or asks you to reply to, a free personal email address',
+    why:'Corporate recruiters normally use a company domain, not a free consumer email provider.',
+    severity:'med', weight:10,
+    regex:/\b[\w.+-]+@(?:gmail|yahoo|hotmail|outlook|icloud)\.com\b/gi
+  },
+];
+
+// ---------- Custom phrases ----------
+let customPhrases = [];
+const customChipList = document.getElementById('customChipList');
+document.getElementById('addCustomBtn').addEventListener('click', addCustomPhrase);
+document.getElementById('customPhraseInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter'){ e.preventDefault(); addCustomPhrase(); }
+});
+function addCustomPhrase(){
+  const input = document.getElementById('customPhraseInput');
+  const val = input.value.trim();
+  if(!val) return;
+  customPhrases.push(val);
+  input.value = '';
+  renderCustomChips();
+}
+function renderCustomChips(){
+  customChipList.innerHTML = '';
+  customPhrases.forEach((phrase, idx) => {
+    const chip = document.createElement('div');
+    chip.className = 'custom-chip';
+    chip.innerHTML = `<span>${escapeHtml(phrase)}</span><button data-idx="${idx}">\u00d7</button>`;
+    chip.querySelector('button').addEventListener('click', () => {
+      customPhrases.splice(idx,1);
+      renderCustomChips();
+    });
+    customChipList.appendChild(chip);
+  });
+}
+
+// ---------- Domain check ----------
+function checkDomainMismatch(company, email){
+  if(!company || !email) return null;
+  const emailMatch = email.match(/@([\w.-]+)/);
+  if(!emailMatch) return null;
+  const domain = emailMatch[1].toLowerCase();
+  const freeProviders = ['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com'];
+  if(freeProviders.includes(domain)) return null; // already caught by freeEmailAsk pattern
+  const domainCore = domain.split('.')[0].replace(/[^a-z0-9]/g,'');
+  const companyCore = company.toLowerCase().replace(/[^a-z0-9]/g,'');
+  if(companyCore.length > 2 && !domainCore.includes(companyCore.slice(0, Math.min(6, companyCore.length))) && !companyCore.includes(domainCore.slice(0, Math.min(6, domainCore.length)))){
+    return {
+      label: `Sender's email domain ("${domain}") doesn't obviously match "${company}"`,
+      why: 'Confirm the real corporate domain on the company\u2019s official website before replying — scammers often register a lookalike domain.',
+      severity: 'med', weight: 15, quotes: [email]
+    };
+  }
+  return null;
+}
+
+// ---------- Analysis ----------
+document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
+
+function escapeHtml(str){
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function runAnalysis(){
+  const text = document.getElementById('msgText').value.trim();
+  const company = document.getElementById('companyName').value.trim();
+  const senderEmail = document.getElementById('senderEmail').value.trim();
+
+  if(!text){
+    document.getElementById('msgText').focus();
+    return;
+  }
+
+  let score = 0;
+  const foundFlags = [];
+  const matchRanges = [];
+
+  patterns.forEach(p => {
+    const re = new RegExp(p.regex.source, p.regex.flags);
+    let m;
+    const quotes = [];
+    let matchedOnce = false;
+    while((m = re.exec(text)) !== null){
+      matchedOnce = true;
+      quotes.push(m[0]);
+      matchRanges.push({start:m.index, end:m.index + m[0].length, severity:p.severity});
+      if(m.index === re.lastIndex) re.lastIndex++;
+    }
+    if(matchedOnce){
+      score += p.weight;
+      foundFlags.push({label:p.label, why:p.why, severity:p.severity, quotes: [...new Set(quotes)].slice(0,3)});
+    }
+  });
+
+  // Custom phrases
+  customPhrases.forEach(phrase => {
+    const idx = text.toLowerCase().indexOf(phrase.toLowerCase());
+    if(idx !== -1){
+      score += 10;
+      matchRanges.push({start:idx, end:idx+phrase.length, severity:'med'});
+      foundFlags.push({label:`Matched your custom phrase: "${phrase}"`, why:'', severity:'med', quotes:[phrase]});
+    }
+  });
+
+  // Domain mismatch
+  const domainFlag = checkDomainMismatch(company, senderEmail);
+  if(domainFlag){
+    score += domainFlag.weight;
+    foundFlags.push(domainFlag);
+  }
+
+  // Profile checklist contributions
+  profileChecks.forEach(c => {
+    const box = document.getElementById(c.id);
+    if(box && box.checked){
+      score += c.weight;
+      foundFlags.push({label:c.label, why:'', severity: c.weight >= 20 ? 'high' : (c.weight >= 10 ? 'med' : 'low'), quotes: []});
+    }
+  });
+
+  score = Math.min(100, score);
+
+  const sevOrder = {high:0, med:1, low:2};
+  foundFlags.sort((a,b)=> sevOrder[a.severity]-sevOrder[b.severity]);
+
+  renderReport(score, foundFlags, text, matchRanges, company);
+  saveHistory(score, company, foundFlags.length);
+}
+
+let lastReportSummary = '';
+
+function renderReport(score, flags, text, matchRanges, company){
+  document.getElementById('emptyState').style.display = 'none';
+  const body = document.getElementById('reportBody');
+  body.style.display = 'block';
+
+  const scoreLine = document.getElementById('scoreLine');
+  const scoreBar = document.getElementById('scoreBar');
+
+  let verdictText, verdictClass, barColor;
+  if(score >= 55){
+    verdictText = 'High risk'; verdictClass = 'red'; barColor = 'var(--red)';
+  } else if(score >= 25){
+    verdictText = 'Proceed with caution'; verdictClass = 'amber'; barColor = 'var(--amber)';
+  } else {
+    verdictText = 'Low signal detected'; verdictClass = 'green'; barColor = 'var(--green)';
+  }
+
+  document.getElementById('stampEl').className = 'stamp ' + verdictClass;
+  document.getElementById('stampEl').textContent = verdictText;
+
+  scoreLine.textContent = `Pattern match strength: ${score} / 100` + (company ? ` — claimed employer: ${company}` : '');
+  scoreBar.style.width = score + '%';
+  scoreBar.style.background = barColor;
+
+  const reportLinksEl = document.getElementById('reportLinks');
+  reportLinksEl.style.display = score >= 25 ? 'block' : 'none';
+
+  const flagListEl = document.getElementById('flagList');
+  flagListEl.innerHTML = '';
+  let summaryLines = [`Recruiter message check — verdict: ${verdictText} (pattern match strength ${score}/100)`, company ? `Claimed employer: ${company}` : '', ''];
+
+  if(flags.length === 0){
+    flagListEl.innerHTML = `<div class="no-flags">No known scam patterns matched in the text or checklist. That's a good sign, but it doesn't confirm the sender is legitimate — still verify through the company's own site or careers page.</div>`;
+    summaryLines.push('No known scam patterns matched.');
+  } else {
+    flags.forEach(f => {
+      const li = document.createElement('li');
+      li.className = 'flag-item';
+      const sevLabel = f.severity === 'high' ? 'High' : (f.severity === 'med' ? 'Medium' : 'Low');
+      let quoteHtml = '';
+      if(f.quotes && f.quotes.length){
+        quoteHtml = f.quotes.map(q => `<span class="flag-quote">"${escapeHtml(q)}"</span>`).join('');
+      }
+      const whyHtml = f.why ? `<span class="flag-why">${escapeHtml(f.why)}</span>` : '';
+      li.innerHTML = `<span class="flag-sev ${f.severity}">${sevLabel}</span><span class="flag-text">${escapeHtml(f.label)}${whyHtml}${quoteHtml}</span>`;
+      flagListEl.appendChild(li);
+      summaryLines.push(`[${sevLabel}] ${f.label}${f.quotes && f.quotes.length ? ' — e.g. "' + f.quotes[0] + '"' : ''}`);
+    });
+  }
+  lastReportSummary = summaryLines.filter(Boolean).join('\n');
+
+  const annotatedEl = document.getElementById('annotatedText');
+  if(matchRanges.length === 0){
+    annotatedEl.innerHTML = escapeHtml(text) || '<em>No message text was provided.</em>';
+  } else {
+    matchRanges.sort((a,b)=>a.start-b.start);
+    const merged = [];
+    matchRanges.forEach(r => {
+      const last = merged[merged.length-1];
+      if(last && r.start <= last.end){
+        last.end = Math.max(last.end, r.end);
+        if(r.severity === 'high') last.severity = 'high';
+        else if(r.severity === 'med' && last.severity !== 'high') last.severity = 'med';
+      } else {
+        merged.push({...r});
+      }
+    });
+    let html = '';
+    let cursor = 0;
+    merged.forEach(r => {
+      html += escapeHtml(text.slice(cursor, r.start));
+      const cls = r.severity === 'high' ? 'hi-high' : 'hi-med';
+      html += `<mark class="${cls}">${escapeHtml(text.slice(r.start, r.end))}</mark>`;
+      cursor = r.end;
+    });
+    html += escapeHtml(text.slice(cursor));
+    annotatedEl.innerHTML = html;
+  }
+
+  body.scrollIntoView({behavior:'smooth', block:'nearest'});
+}
+
+document.getElementById('copyBtn').addEventListener('click', async () => {
+  try{
+    await navigator.clipboard.writeText(lastReportSummary);
+    const btn = document.getElementById('copyBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(()=>{ btn.textContent = original; }, 1500);
+  } catch(err){
+    console.error('Clipboard error:', err);
+  }
+});
+document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+// ---------- History (in-memory, with manual export/import — no browser storage APIs used) ----------
+let historyEntries = [];
+
+function saveHistory(score, company, flagCount){
+  historyEntries.unshift({
+    ts: new Date().toISOString(),
+    score, company: company || '(not specified)', flagCount
+  });
+  historyEntries = historyEntries.slice(0, 25);
+  renderHistory(historyEntries);
+}
+
+function verdictBadge(score){
+  if(score >= 55) return {cls:'red', label:'High'};
+  if(score >= 25) return {cls:'amber', label:'Caution'};
+  return {cls:'green', label:'Low'};
+}
+
+function renderHistory(entries){
+  const listEl = document.getElementById('historyList');
+  const clearBtn = document.getElementById('clearHistoryBtn');
+  const downloadBtn = document.getElementById('downloadHistoryBtn');
+  const loadLabel = document.getElementById('loadHistoryLabel');
+
+  loadLabel.style.display = 'inline-block'; // always available, even with no entries yet
+
+  if(!entries || entries.length === 0){
+    listEl.innerHTML = '<div class="history-empty">No past checks yet this session. Load a previously downloaded history file to see past ones.</div>';
+    clearBtn.style.display = 'none';
+    downloadBtn.style.display = 'none';
+    return;
+  }
+  clearBtn.style.display = 'inline-block';
+  downloadBtn.style.display = 'inline-block';
+  listEl.innerHTML = '';
+  entries.forEach(e => {
+    const badge = verdictBadge(e.score);
+    const d = new Date(e.ts);
+    const dateStr = d.toLocaleDateString(undefined, {month:'short', day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
+    const row = document.createElement('div');
+    row.className = 'history-item';
+    row.innerHTML = `<span>${escapeHtml(e.company)} <span class="history-meta">— ${dateStr}</span></span><span class="history-badge ${badge.cls}">${badge.label} · ${e.score}</span>`;
+    listEl.appendChild(row);
+  });
+}
+
+document.getElementById('clearHistoryBtn').addEventListener('click', () => {
+  historyEntries = [];
+  renderHistory(historyEntries);
+});
+
+document.getElementById('downloadHistoryBtn').addEventListener('click', () => {
+  const blob = new Blob([JSON.stringify(historyEntries, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `recruiter-check-history-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById('loadHistoryInput').addEventListener('change', (e) => {
+  const file = e.target.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (evt) => {
+    try{
+      const loaded = JSON.parse(evt.target.result);
+      if(!Array.isArray(loaded)) throw new Error('Not a history file');
+      // Merge with current entries, newest first, capped at 25
+      const merged = [...loaded, ...historyEntries];
+      merged.sort((a,b) => new Date(b.ts) - new Date(a.ts));
+      historyEntries = merged.slice(0, 25);
+      renderHistory(historyEntries);
+    } catch(err){
+      alert('Could not read that file — make sure it\'s a history file downloaded from this tool.');
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = ''; // allow re-loading the same file later
+});
+
+// Initial render
+renderHistory(historyEntries);
+</script>
+</body>
+</html>
