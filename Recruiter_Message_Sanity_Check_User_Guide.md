@@ -6,6 +6,8 @@ This guide covers how to use the Recruiter Message Sanity Check tool to screen s
 
 Fake recruiter messages on LinkedIn and email have become increasingly common. This tool scans a message you paste in and checks it against a list of wording patterns that show up again and again in these scams — things like being pushed to WhatsApp, vague job titles, requests for upfront fees, or asks for banking details.
 
+It also flags what's *missing*, not just what's present. A message that never names an employer, never states a job title, or routes the whole opportunity through an unnamed "friend of a friend" scores as suspicious even if it avoids obviously scammy language — because a real recruiter always has an answer for who they work for and what the role is.
+
 It returns a plain-language verdict — Low, Caution, or High — along with a pattern match strength score out of 100. This is a starting point for your own judgment, not a final answer.
 
 ## 2. Getting Started
@@ -28,7 +30,8 @@ Some warning signs can't be read from the message text alone. Before running the
 - Profile created recently (within the last 6 months)
 - Fewer than about 50 connections
 - No verification badge on the profile
-- A reverse image search on the profile photo turns up on a stock site or someone else's profile
+- Sender's headline/profession has nothing to do with recruiting or the pitch (e.g. a nurse or engineer suddenly offering an unrelated "project")
+- Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin)
 - Not listed as an employee on the company's own LinkedIn page
 - Few or no mutual connections in your industry
 - Little to no posting or comment history
@@ -46,6 +49,8 @@ The report shows three things:
 
 Below the flag list, the full message reappears with flagged phrases highlighted in place, so you can see exactly what raised concern in context.
 
+If the result lands in the Proceed with caution range, a fourth block appears above the highlighted message: a ready-to-send follow-up message. See Section 6.
+
 ## 5. If a Message Scores Caution or High
 
 At a score of 25 or above, a "Report this" section appears with direct links to:
@@ -56,7 +61,21 @@ At a score of 25 or above, a "Report this" section appears with direct links to:
 
 Avoid providing any personal, financial, or banking information in the meantime, regardless of how the message is framed.
 
-## 6. Other Features
+## 6. Follow-Up Message (Caution-Range Results Only)
+
+When a result lands in the Proceed with caution range (25–54), the report includes a suggested follow-up message and a **Copy follow-up message** button.
+
+This is not a verification tool — it's wording you can send back to the sender to ask for the specifics a real recruiter can always provide, without volunteering any personal information of your own:
+
+- The full, official company name
+- A link to the job posting, or a requisition/job ID
+- The job title and team the role sits on
+
+If the flagged patterns included an unnamed intermediary (a "friend," "colleague," or similar go-between) or a mismatch between the sender's email and their claimed employer, the suggested message adjusts to ask for those specifically — for example, a way to verify the intermediary directly, or confirmation that correspondence is coming from a company email address.
+
+This feature does not appear on High risk results. At that score, the recommended move isn't a more careful reply — it's to stop engaging and use the reporting links in Section 5 instead. A vague or evasive response to the follow-up message is itself informative, but a smooth, professional-sounding non-answer doesn't clear a sender either — keep verifying independently through the company's own site.
+
+## 7. Other Features
 
 **Custom red flags**
 Add your own phrases under "Your own red flags" before running a check. These are checked in addition to the built-in list, for the current session only.
@@ -70,20 +89,22 @@ Every check run during the current session is logged at the bottom of the report
 1. Click **Download history (.json)** to save the session's log as a file.
 2. Next time, click **Load history file** and select that file to bring past results back into view.
 
-## 7. Customizing the Pattern List
+## 8. Customizing the Pattern List
 
 All detection patterns live in a single array in the tool's source code, each with a label, an explanation, a severity, a score weight, and a matching rule. Anyone comfortable editing the HTML file directly can add, remove, or adjust entries there to tune detection over time.
 
-## 8. Limitations
+## 9. Limitations
 
 - Regex-based matching will miss scams that avoid the specific wording checked for, and can occasionally flag legitimate messages using similar phrasing.
 - The domain-mismatch check is a rough heuristic and can misfire on abbreviated or rebranded company names.
+- The "no company named" and "no job title mentioned" checks look for absence, not presence — an unusually short but entirely legitimate message (for example, "Are you the Tom who spoke at the OT security conference last year?") can occasionally pick up a low-weight flag. These checks carry modest weight for that reason, and rarely push a score into High risk on their own.
+- The suggested follow-up message is a starting point for asking better questions, not a scam-detection tool in its own right — how someone responds still requires your own judgment.
 - This tool cannot confirm anyone's identity, employment, or a company's legitimacy — always verify independently through the company's official careers page or domain.
 
-## 9. Quick Reference
+## 10. Quick Reference
 
 | Verdict | Score range | What it means |
 |---|---|---|
 | Low signal detected | 0–24 | Few or no known scam patterns matched. Still verify independently. |
-| Proceed with caution | 25–54 | Several patterns matched. Slow down and verify before sharing any personal information. |
+| Proceed with caution | 25–54 | Several patterns matched. A follow-up message is suggested (see Section 6). Slow down and verify before sharing any personal information. |
 | High risk | 55–100 | Strong overlap with known scam wording. Treat with significant skepticism and consider reporting. |
