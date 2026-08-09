@@ -384,6 +384,30 @@
     line-height:1.6;
   }
 
+  .followup-box{
+    margin-top:18px;
+    padding-top:14px;
+    border-top:1px dashed var(--rule);
+  }
+  .followup-note{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    color:var(--ink-soft);
+    line-height:1.6;
+    margin-bottom:10px;
+  }
+  .followup-text{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    line-height:1.7;
+    white-space:pre-wrap;
+    padding:12px;
+    background:#F7F2E4;
+    border:1px solid var(--rule);
+    border-radius:2px;
+    margin-bottom:10px;
+  }
+
   .report-links{
     margin-top:18px;
     padding-top:14px;
@@ -550,6 +574,13 @@
           <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">Report it to the FTC at ReportFraud.ftc.gov</a>
         </div>
 
+        <div class="followup-box" id="followUpBox" style="display:none;">
+          <label class="field-label" style="margin-bottom:8px;">Follow-up message to send</label>
+          <div class="followup-note">This lands in the caution range — not clearly a scam, not clearly clean. Before sharing anything else, send something that asks for the specifics a real recruiter can always provide. A vague or evasive reply is itself informative.</div>
+          <div class="followup-text" id="followUpText"></div>
+          <button class="icon-btn" id="copyFollowUpBtn">Copy follow-up message</button>
+        </div>
+
         <div class="annotated-box">
           <label class="field-label" style="margin-bottom:8px;">Message with flagged phrases marked</label>
           <div class="annotated-text" id="annotatedText"></div>
@@ -642,7 +673,13 @@ const patterns = [
     id:'earlyContactAsk', label:'Asks for your personal email and phone number right away, before any formal process',
     why:'This is often the first step in moving you off LinkedIn to a channel that\u2019s harder to trace.',
     severity:'med', weight:12,
-    regex:/reply with your (?:preferred )?(?:email|phone|contact)/gi
+    regex:/\b(?:reply with|leave|share|provide|send|drop) your (?:preferred )?(?:email|phone|contact|number)\b/gi
+  },
+  {
+    id:'unnamedIntermediary', label:'The actual opportunity comes from an unnamed third party \u2014 a "friend," "colleague," or "associate" you can\u2019t independently verify',
+    why:'A real employer\u2019s recruiter identifies themselves and their company directly. Routing you to an unnamed go-between means there\u2019s no one you can actually check up on before handing over contact details.',
+    severity:'high', weight:25,
+    regex:/\b(a friend of mine|my friend(?:'?s)?|a colleague of mine|an associate of mine|an acquaintance of mine|someone i know|a contact of mine|a friend who)\b/gi
   },
   {
     id:'urgency', label:'Uses pressure or urgency language',
@@ -666,7 +703,7 @@ const patterns = [
     id:'genericFlattery', label:'Uses generic, copy-pasted-sounding flattery about your background',
     why:'Scam messages are often templated across hundreds of targets, so the compliment stays vague.',
     severity:'low', weight:5,
-    regex:/\b(impressed by your (?:extensive|background)|your background caught our (?:attention|eye)|reviewed your (?:profile|background) and (?:was|were) impressed)\b/gi
+    regex:/\b(impressed by your (?:extensive|background)|your background caught our (?:attention|eye)|reviewed your (?:profile|background|experience) and (?:was|were|it) impressed|aligns (?:perfectly|well|closely) with (?:your|a)|(?:perfect|great|excellent) fit for|caught our (?:eye|attention))\b/gi
   },
   {
     id:'genericOpportunity', label:'Describes the role only in vague, generic terms without a req ID or specific team',
@@ -747,12 +784,42 @@ function checkDomainMismatch(company, email){
   const companyCore = company.toLowerCase().replace(/[^a-z0-9]/g,'');
   if(companyCore.length > 2 && !domainCore.includes(companyCore.slice(0, Math.min(6, companyCore.length))) && !companyCore.includes(domainCore.slice(0, Math.min(6, domainCore.length)))){
     return {
+      id: 'domainMismatch',
       label: `Sender's email domain ("${domain}") doesn't obviously match "${company}"`,
       why: 'Confirm the real corporate domain on the company\u2019s official website before replying — scammers often register a lookalike domain.',
       severity: 'med', weight: 15, quotes: [email]
     };
   }
   return null;
+}
+
+// ---------- Structural checks: what's MISSING is often more telling than what's present ----------
+const COMPANY_ENTITY_RE = /\b[A-Z][a-zA-Z]+(?:\s&?\s?[A-Z][a-zA-Z]+){0,3}\s(?:Inc\.?|LLC|L\.L\.C\.|Ltd\.?|Corp\.?|Corporation|Company|Group|Technologies|Solutions|Systems|Health|Partners|Electric|Energy|Labs|Capital|Industries)\b/;
+
+function checkNoCompanyNamed(company, text){
+  if(company && company.trim()) return null; // user told us the claimed employer, even if not machine-verifiable here
+  if(COMPANY_ENTITY_RE.test(text)) return null; // message itself names a company-like entity
+  if(text.trim().length < 40) return null; // too short to judge fairly
+  return {
+    id: 'noCompanyNamed',
+    label: 'No specific company or employer is named anywhere in the message',
+    why: 'A real recruiter identifies who they work for. A message that talks about "a project" or "an opportunity" without ever naming an employer gives you nothing to independently verify.',
+    severity: 'med', weight: 12, quotes: []
+  };
+}
+
+const ROLE_WORD_RE = /\b(engineer|manager|specialist|director|analyst|developer|coordinator|lead|executive|officer|consultant|administrator|architect|strategist|representative|associate|technician|designer|scientist|recruiter|supervisor|planner|producer)\b/i;
+
+function checkNoRoleSpecified(text){
+  if(text.trim().length < 40) return null;
+  if(ROLE_WORD_RE.test(text)) return null;
+  if(!/\b(project|opportunity|role|position|job|opening|team)\b/i.test(text)) return null; // only flag if it's vaguely gesturing at "a thing" without saying what
+  return {
+    id: 'noRoleSpecified',
+    label: 'No job title, team, or role type is mentioned anywhere in the message',
+    why: 'Real openings reference an actual title (even a working one). "A project" or "an opportunity" with no role attached is a common way to keep a pitch vague enough to fit anyone.',
+    severity: 'med', weight: 10, quotes: []
+  };
 }
 
 // ---------- Analysis ----------
@@ -789,7 +856,7 @@ function runAnalysis(){
     }
     if(matchedOnce){
       score += p.weight;
-      foundFlags.push({label:p.label, why:p.why, severity:p.severity, quotes: [...new Set(quotes)].slice(0,3)});
+      foundFlags.push({id:p.id, label:p.label, why:p.why, severity:p.severity, quotes: [...new Set(quotes)].slice(0,3)});
     }
   });
 
@@ -810,6 +877,18 @@ function runAnalysis(){
     foundFlags.push(domainFlag);
   }
 
+  // Structural absence checks — no company named, no role specified
+  const noCompanyFlag = checkNoCompanyNamed(company, text);
+  if(noCompanyFlag){
+    score += noCompanyFlag.weight;
+    foundFlags.push(noCompanyFlag);
+  }
+  const noRoleFlag = checkNoRoleSpecified(text);
+  if(noRoleFlag){
+    score += noRoleFlag.weight;
+    foundFlags.push(noRoleFlag);
+  }
+
   // Profile checklist contributions
   profileChecks.forEach(c => {
     const box = document.getElementById(c.id);
@@ -824,13 +903,53 @@ function runAnalysis(){
   const sevOrder = {high:0, med:1, low:2};
   foundFlags.sort((a,b)=> sevOrder[a.severity]-sevOrder[b.severity]);
 
-  renderReport(score, foundFlags, text, matchRanges, company);
+  const matchedIds = new Set(foundFlags.map(f=>f.id).filter(Boolean));
+
+  renderReport(score, foundFlags, text, matchRanges, company, matchedIds);
   saveHistory(score, company, foundFlags.length);
+}
+
+// ---------- Follow-up message builder ----------
+// Only offered in the "on the fence" caution band — a high-risk message doesn't
+// need a smarter reply, it needs to not be replied to; a low-risk one doesn't need one either.
+function buildFollowUpMessage(company, matchedIds){
+  const lines = [];
+  lines.push(`Thanks for reaching out${company ? ' about the role at ' + company : ''} \u2014 I'd like to look into this properly before going further. Could you send over a few things:`);
+  lines.push('');
+  lines.push(`- The full, official company name${company ? ' (and how it relates to "' + company + '")' : ''}`);
+  lines.push('- A link to the specific job posting, or a requisition/job ID I can reference');
+  lines.push('- The job title and team this role sits on');
+
+  if(matchedIds.has('unnamedIntermediary')){
+    lines.push('- Since this is on behalf of someone else, their name and a way I can verify them directly \u2014 e.g. their profile on the company\u2019s own site or LinkedIn page');
+  }
+  if(matchedIds.has('freeEmailAsk') || matchedIds.has('domainMismatch')){
+    lines.push('- Confirmation this is coming from (or can continue on) a company email address, not a personal one');
+  }
+
+  lines.push('');
+
+  const closingParts = [];
+  if(matchedIds.has('offPlatform')){
+    closingParts.push('I\u2019d rather keep this on LinkedIn or company email for now rather than move to WhatsApp/Telegram');
+  }
+  if(matchedIds.has('earlyContactAsk')){
+    closingParts.push('happy to share direct contact details once I can see the above');
+  }
+  if(closingParts.length){
+    lines.push(closingParts.map(s=>s.charAt(0).toUpperCase()+s.slice(1)).join(' \u2014 ') + '.');
+  } else {
+    lines.push('Happy to keep talking once I\u2019ve got those details.');
+  }
+
+  return lines.join('\n');
 }
 
 let lastReportSummary = '';
 
-function renderReport(score, flags, text, matchRanges, company){
+let lastFollowUpText = '';
+
+function renderReport(score, flags, text, matchRanges, company, matchedIds){
   document.getElementById('emptyState').style.display = 'none';
   const body = document.getElementById('reportBody');
   body.style.display = 'block';
@@ -856,6 +975,16 @@ function renderReport(score, flags, text, matchRanges, company){
 
   const reportLinksEl = document.getElementById('reportLinks');
   reportLinksEl.style.display = score >= 25 ? 'block' : 'none';
+
+  const followUpBox = document.getElementById('followUpBox');
+  if(verdictClass === 'amber'){
+    lastFollowUpText = buildFollowUpMessage(company, matchedIds || new Set());
+    document.getElementById('followUpText').textContent = lastFollowUpText;
+    followUpBox.style.display = 'block';
+  } else {
+    followUpBox.style.display = 'none';
+    lastFollowUpText = '';
+  }
 
   const flagListEl = document.getElementById('flagList');
   flagListEl.innerHTML = '';
@@ -924,6 +1053,18 @@ document.getElementById('copyBtn').addEventListener('click', async () => {
   }
 });
 document.getElementById('printBtn').addEventListener('click', () => window.print());
+
+document.getElementById('copyFollowUpBtn').addEventListener('click', async () => {
+  try{
+    await navigator.clipboard.writeText(lastFollowUpText);
+    const btn = document.getElementById('copyFollowUpBtn');
+    const original = btn.textContent;
+    btn.textContent = 'Copied';
+    setTimeout(()=>{ btn.textContent = original; }, 1500);
+  } catch(err){
+    console.error('Clipboard error:', err);
+  }
+});
 
 // ---------- History (in-memory, with manual export/import — no browser storage APIs used) ----------
 let historyEntries = [];

@@ -24,11 +24,13 @@ See `Recruiter_Message_Sanity_Check_User_Guide.md` for the full walkthrough, inc
 
 ## Features
 
-- Scans pasted messages against a built-in list of known scam indicators (off-platform push to WhatsApp/Telegram, vague title/comp, upfront fees, requests for bank/SSN details, urgency language, crypto mentions, and more)
+- Scans pasted messages against a built-in list of known scam indicators (off-platform push to WhatsApp/Telegram, vague title/comp, upfront fees, requests for bank/SSN details, urgency language, crypto mentions, unnamed "friend of a friend" go-betweens, and more)
+- Flags what's *missing*, not just what's present: a message with no company name and no job title anywhere scores as a red flag even if it uses no scammy keywords at all
 - Flags a mismatch between the sender's email domain and their claimed employer
 - Manual checklist for profile-based signals the tool can't read automatically (account age, connection count, verification badge, reverse-image-search hits)
 - Custom red-flag phrases, session-only
 - Inline highlighting of every flagged phrase in the original message
+- For messages that land in the caution range, generates a ready-to-send follow-up message asking for the specifics a real recruiter can always provide (company name, job posting/req ID, verifiable contact) — a vague or evasive reply is itself a signal
 - Direct links to LinkedIn's reporting flow, IC3, and the FTC when a message scores in the caution/high range
 - Three sample messages to try the tool without a real one on hand
 - Session history with manual download/reload — no accounts, no browser storage APIs
