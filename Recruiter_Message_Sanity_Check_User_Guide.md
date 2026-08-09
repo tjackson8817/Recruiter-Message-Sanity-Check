@@ -31,11 +31,19 @@ Some warning signs can't be read from the message text alone. Before running the
 - Fewer than about 50 connections
 - No verification badge on the profile
 - Sender's headline/profession has nothing to do with recruiting or the pitch (e.g. a nurse or engineer suddenly offering an unrelated "project")
-- Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin)
+- Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin) — optional; the tool links to Is It AI? and Quillbot's AI Image Detector, two free no-signup checkers, so you can test the photo without leaving the page
 - Reverse image search shows the photo used elsewhere / on a stock site — optional; the tool provides one-click links to Google Images, TinEye, and Bing Visual Search so you can check without leaving the page
 - Not listed as an employee on the company's own LinkedIn page
 - Few or no mutual connections in your industry
 - Little to no posting or comment history
+
+*How to check if someone is a real listed employee on LinkedIn:*
+
+1. Search for the company by name in LinkedIn's top search bar and open their official company page — not a person's profile.
+2. Click the **People** tab near the top of the company page. This shows everyone who currently lists that company in their LinkedIn profile.
+3. Use the "Search by name" box on the People tab to search the sender's name. A genuine current employee will show up here.
+4. No result isn't automatic proof either way — it could mean they don't work there, or (rarely) their privacy settings hide them from the list. Weigh it alongside the other checklist items rather than on its own.
+5. Also check the sender's own profile: a verified company listing in their Experience section shows the company's logo and links to the real company page. Plain, unlinked text is a weaker, self-reported claim — anyone can type any company name into that field.
 
 **Step 4 — Run the check**
 Click "Run the check." Results appear on the right within a second or two.

@@ -650,7 +650,11 @@ const profileChecks = [
   { id:'fewConnections', label:'Fewer than ~50 connections', weight:10 },
   { id:'noBadge', label:'No verification badge (ID, employer, or Clear/Entra verification)', weight:5 },
   { id:'unrelatedProfession', label:'Sender\u2019s headline/profession has nothing to do with recruiting or the pitch (e.g. a nurse or engineer suddenly offering an unrelated "project")', weight:20 },
-  { id:'genericAiPhoto', label:'Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin)', weight:15 },
+  { id:'genericAiPhoto', label:'Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin)', weight:15, optional:true,
+    links:[
+      {text:'Is It AI?', url:'https://isitai.com/ai-image-detector'},
+      {text:'Quillbot AI Image Detector', url:'https://quillbot.com/ai-image-detector'}
+    ] },
   { id:'stockPhoto', label:'Reverse image search shows the photo used elsewhere / on a stock site', weight:25, optional:true,
     links:[
       {text:'Google Images', url:'https://images.google.com/'},
