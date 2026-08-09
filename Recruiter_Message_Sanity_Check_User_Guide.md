@@ -32,6 +32,7 @@ Some warning signs can't be read from the message text alone. Before running the
 - No verification badge on the profile
 - Sender's headline/profession has nothing to do with recruiting or the pitch (e.g. a nurse or engineer suddenly offering an unrelated "project")
 - Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin)
+- Reverse image search shows the photo used elsewhere / on a stock site — optional; the tool provides one-click links to Google Images, TinEye, and Bing Visual Search so you can check without leaving the page
 - Not listed as an employee on the company's own LinkedIn page
 - Few or no mutual connections in your industry
 - Little to no posting or comment history

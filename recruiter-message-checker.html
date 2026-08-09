@@ -184,6 +184,14 @@
   }
   .checkbox-row input{margin-top:3px; accent-color:var(--red);}
   .checkbox-row label{cursor:pointer;}
+  .checklist-links{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:10.5px;
+    color:var(--ink-soft);
+    margin-top:3px;
+  }
+  .checklist-links a{color:var(--ink-soft); text-decoration:underline;}
+  .checklist-links a:hover{color:var(--red);}
 
   .custom-add-row{display:flex; gap:8px; margin-bottom:8px;}
   .custom-add-row input{flex:1;}
@@ -643,6 +651,12 @@ const profileChecks = [
   { id:'noBadge', label:'No verification badge (ID, employer, or Clear/Entra verification)', weight:5 },
   { id:'unrelatedProfession', label:'Sender\u2019s headline/profession has nothing to do with recruiting or the pitch (e.g. a nurse or engineer suddenly offering an unrelated "project")', weight:20 },
   { id:'genericAiPhoto', label:'Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin)', weight:15 },
+  { id:'stockPhoto', label:'Reverse image search shows the photo used elsewhere / on a stock site', weight:25, optional:true,
+    links:[
+      {text:'Google Images', url:'https://images.google.com/'},
+      {text:'TinEye', url:'https://tineye.com/'},
+      {text:'Bing Visual Search', url:'https://www.bing.com/visualsearch'}
+    ] },
   { id:'notListed', label:'Not listed as an employee on the company\u2019s own LinkedIn page', weight:25 },
   { id:'noMutuals', label:'Few or no mutual connections in your industry', weight:8 },
   { id:'noActivity', label:'Little to no posting or comment history', weight:7 },
@@ -652,7 +666,12 @@ const checklistEl = document.getElementById('checklist');
 profileChecks.forEach(c => {
   const row = document.createElement('div');
   row.className = 'checkbox-row';
-  row.innerHTML = `<input type="checkbox" id="${c.id}"><label for="${c.id}">${c.label}</label>`;
+  let linksHtml = '';
+  if(c.links && c.links.length){
+    const linkTags = c.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.text}</a>`).join(' \u00b7 ');
+    linksHtml = `<div class="checklist-links">Optional \u2014 check quickly: ${linkTags}</div>`;
+  }
+  row.innerHTML = `<input type="checkbox" id="${c.id}"><div><label for="${c.id}">${c.label}</label>${linksHtml}</div>`;
   checklistEl.appendChild(row);
 });
 
