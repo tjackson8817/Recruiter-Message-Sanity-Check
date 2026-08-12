@@ -78,6 +78,33 @@
     margin-bottom:18px;
     align-items:center;
   }
+  .mode-toggle{
+    display:flex;
+    align-items:center;
+    gap:16px;
+    flex-wrap:wrap;
+    margin-bottom:16px;
+    padding:10px 14px;
+    background:var(--paper-dark);
+    border:1px solid var(--rule);
+    border-radius:3px;
+  }
+  .mode-toggle-label{
+    font-family:'IBM Plex Mono',monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+  }
+  .mode-opt{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-family:'IBM Plex Mono',monospace;
+    font-size:12.5px;
+    cursor:pointer;
+  }
+  .mode-opt input{accent-color:var(--red);}
   .examples-row span{
     font-family:'IBM Plex Mono',monospace;
     font-size:11px;
@@ -490,7 +517,7 @@
   }
 
   @media print{
-    .panel:first-child, .examples-row, footer.note, .report-actions, button{display:none !important;}
+    #messagePanel, #postingPanel, .examples-row, .mode-toggle, footer.note, .report-actions, button{display:none !important;}
     body{background:#fff;}
     .panel{box-shadow:none; border:none;}
   }
@@ -501,12 +528,18 @@
 
   <header>
     <div class="folder-tab">EVIDENCE FOLDER</div>
-    <span class="case-no">FORM RM-1<br>Sanity check, not a verdict</span>
-    <h1>Recruiter Message Sanity Check</h1>
-    <div class="sub">Paste the InMail or message below. This flags known scam patterns — it doesn't prove someone is fake, and a clean result doesn't prove someone is real.</div>
+    <span class="case-no" id="caseNoEl">FORM RM-1<br>Sanity check, not a verdict</span>
+    <h1 id="titleEl">Recruiter Message Sanity Check</h1>
+    <div class="sub" id="subEl">Paste the InMail or message below. This flags known scam patterns — it doesn't prove someone is fake, and a clean result doesn't prove someone is real.</div>
   </header>
 
-  <div class="examples-row">
+  <div class="mode-toggle" id="modeToggle">
+    <span class="mode-toggle-label">Checking a:</span>
+    <label class="mode-opt"><input type="radio" name="checkMode" value="message" checked> Recruiter Message</label>
+    <label class="mode-opt"><input type="radio" name="checkMode" value="posting"> Job Posting</label>
+  </div>
+
+  <div class="examples-row" id="examplesRow">
     <span>Try a sample:</span>
     <button class="chip-btn" data-ex="0">Vague title / WhatsApp handoff</button>
     <button class="chip-btn" data-ex="1">Upfront equipment fee</button>
@@ -516,7 +549,7 @@
   <div class="grid">
 
     <!-- LEFT: INPUT -->
-    <div class="panel">
+    <div class="panel" id="messagePanel">
       <h2>Exhibit A — The Message</h2>
 
       <div class="field-row">
@@ -554,6 +587,50 @@
       <div class="hint">Nothing you enter here leaves your browser. The check runs locally against a fixed list of known scam patterns.</div>
     </div>
 
+    <!-- LEFT: INPUT (Job Posting mode) -->
+    <div class="panel" id="postingPanel" style="display:none;">
+      <h2>Exhibit A — The Posting</h2>
+
+      <div class="field-row">
+        <label class="field-label" for="postingText">Paste the job posting text</label>
+        <textarea id="postingText" placeholder="Remote Data Entry Specialist — $45/hr, no experience necessary..."></textarea>
+      </div>
+
+      <div class="two-col field-row">
+        <div>
+          <label class="field-label" for="postingCompanyName">Company the posting is for</label>
+          <input type="text" id="postingCompanyName" placeholder="e.g. Schneider Electric">
+        </div>
+        <div>
+          <label class="field-label" for="postingApplyContact">How to apply — email or link (if given)</label>
+          <input type="text" id="postingApplyContact" placeholder="e.g. hr.dept@gmail.com or a bit.ly link">
+        </div>
+      </div>
+
+      <div class="field-row">
+        <label class="field-label" for="postingSource">Where you found this posting</label>
+        <input type="text" id="postingSource" placeholder="e.g. company's own careers page, LinkedIn, Indeed, a text message">
+      </div>
+
+      <fieldset>
+        <legend>Listing signals — check what applies</legend>
+        <div id="postingChecklist"></div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Your own red flags (optional)</legend>
+        <div class="custom-add-row">
+          <input type="text" id="postingCustomPhraseInput" placeholder="Add a phrase you've seen in scam postings">
+          <button class="add-btn" id="postingAddCustomBtn">Add</button>
+        </div>
+        <div class="custom-chip-list" id="postingCustomChipList"></div>
+        <div class="hint" style="margin-top:0;">These are checked in addition to the built-in list, for this session only.</div>
+      </fieldset>
+
+      <button class="analyze" id="postingAnalyzeBtn">Run the check</button>
+      <div class="hint">Nothing you enter here leaves your browser. The check runs locally against a fixed list of known scam-listing patterns.</div>
+    </div>
+
     <!-- RIGHT: REPORT -->
     <div class="panel" id="reportPanel">
       <h2>Findings</h2>
@@ -570,27 +647,27 @@
           <div class="stamp" id="stampEl">—</div>
         </div>
         <div class="score-line" id="scoreLine"></div>
-        <div class="score-caption">Pattern match strength — how much this message overlaps with known scam wording, not a probability of fraud</div>
+        <div class="score-caption" id="scoreCaption">Pattern match strength — how much this message overlaps with known scam wording, not a probability of fraud</div>
         <div class="score-bar-track"><div class="score-bar-fill" id="scoreBar"></div></div>
 
         <ul class="flag-list" id="flagList" style="margin-top:18px;"></ul>
 
         <div class="report-links" id="reportLinks" style="display:none;">
           <label class="field-label" style="margin-bottom:8px;">If this looks like a scam, report it</label>
-          <a href="https://www.linkedin.com/help/linkedin/ask/TS-RSF" target="_blank" rel="noopener">Report a fake profile or message on LinkedIn</a>
+          <a href="https://www.linkedin.com/help/linkedin/ask/TS-RSF" target="_blank" rel="noopener">Report a fake profile, message, or job posting on LinkedIn</a>
           <a href="https://www.ic3.gov/" target="_blank" rel="noopener">File a report with the FBI's Internet Crime Complaint Center (IC3)</a>
           <a href="https://reportfraud.ftc.gov/" target="_blank" rel="noopener">Report it to the FTC at ReportFraud.ftc.gov</a>
         </div>
 
         <div class="followup-box" id="followUpBox" style="display:none;">
-          <label class="field-label" style="margin-bottom:8px;">Follow-up message to send</label>
-          <div class="followup-note">This lands in the caution range — not clearly a scam, not clearly clean. Before sharing anything else, send something that asks for the specifics a real recruiter can always provide. A vague or evasive reply is itself informative.</div>
+          <label class="field-label" style="margin-bottom:8px;" id="followUpLabel">Follow-up message to send</label>
+          <div class="followup-note" id="followUpNote">This lands in the caution range — not clearly a scam, not clearly clean. Before sharing anything else, send something that asks for the specifics a real recruiter can always provide. A vague or evasive reply is itself informative.</div>
           <div class="followup-text" id="followUpText"></div>
           <button class="icon-btn" id="copyFollowUpBtn">Copy follow-up message</button>
         </div>
 
         <div class="annotated-box">
-          <label class="field-label" style="margin-bottom:8px;">Message with flagged phrases marked</label>
+          <label class="field-label" style="margin-bottom:8px;" id="annotatedLabel">Message with flagged phrases marked</label>
           <div class="annotated-text" id="annotatedText"></div>
         </div>
       </div>
@@ -610,42 +687,113 @@
   </div>
 
   <footer class="note">
-    This tool checks for wording and behavior patterns common in fake recruiter scams — it does not verify anyone's real identity or employer. For that, check the company's own careers page for a matching role, look up the sender on the company's official site, and be wary of any recruiting process that moves to WhatsApp/Telegram or asks for money, bank details, or ID documents before an offer. History lasts only for this browser session unless you download it — nothing is sent anywhere, and nothing is saved automatically.
+    This tool checks for wording and behavior patterns common in fake recruiter messages and fake job postings — it does not verify anyone's real identity, employer, or listing. For that, check the company's own careers page for a matching role, look up the sender on the company's official site, and be wary of any process that moves to WhatsApp/Telegram or asks for money, bank details, or ID documents before an offer. History lasts only for this browser session unless you download it — nothing is sent anywhere, and nothing is saved automatically.
   </footer>
 
 </div>
 
 <script>
-// ---------- Sample messages ----------
-const examples = [
+// ---------- Sample messages (Recruiter Message mode) ----------
+const messageExamples = [
   {
+    label: 'Vague title / WhatsApp handoff',
     company: 'Schneider Electric',
     email: '',
     text: `Dear Thomas,\n\nI recently reviewed your background and was impressed by your extensive leadership in operational technology cybersecurity. Schneider Electric is conducting interview-based discussions with experienced cybersecurity leaders for strategic opportunities. At this stage, the title is under discussion, the business unit is under discussion, and the compensation package is under discussion.\n\nIf this opportunity is of interest, please reply with your preferred email address and phone number. Our Project Lead, Tanya, will share additional details.\n\nWe primarily communicate with global talent regarding this project via WhatsApp. If convenient, you may also connect with the project manager via WhatsApp: +1 (215) 391-3221.\n\nBest regards,\nBenjamin Hakes\nSenior Recruitment Specialist`
   },
   {
+    label: 'Upfront equipment fee',
     company: 'Global Freight Solutions',
     email: 'hr.dept@gmail.com',
     text: `Hello,\n\nCongratulations! You have been selected for a remote logistics coordinator role paying $85/hour. To get started immediately, you will need to purchase your own equipment (laptop and scanner) and we will reimburse you after your first week. Please send a $250 processing fee to activate your account and reply with your bank account details for direct deposit setup.\n\nAct fast, we only have 2 slots left this week.\n\nRegards,\nHR Department`
   },
   {
+    label: 'Ordinary, low-flag message',
     company: 'Acme Analytics',
     email: 'r.chen@acmeanalytics.com',
     text: `Hi Sam,\n\nI'm a recruiter at Acme Analytics working on our Senior Data Engineer opening (req #4471) on the Platform team. Your experience with distributed systems stood out. The role is based in Austin with a hybrid schedule, targeting $150-170k base depending on experience.\n\nWould you be open to a 20-minute call this week? Happy to work around your schedule and can send over the full job description beforehand.\n\nBest,\nRiley Chen\nTechnical Recruiter, Acme Analytics`
   }
 ];
 
-document.querySelectorAll('.chip-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    const ex = examples[btn.dataset.ex];
-    document.getElementById('msgText').value = ex.text;
-    document.getElementById('companyName').value = ex.company;
-    document.getElementById('senderEmail').value = ex.email;
+// ---------- Sample postings (Job Posting mode) ----------
+const postingExamples = [
+  {
+    label: 'Reshipping / evergreen listing',
+    company: 'Global Logistics Partners',
+    apply: 'hr.dept@gmail.com',
+    source: 'Emailed to me directly, unsolicited',
+    text: `Remote Package Coordinator — $38/hr, No Experience Necessary\n\nWe are hiring immediately! This role involves receiving packages at your home address and reshipping them to our international clients using provided shipping labels. Flexible hours, work from anywhere, unlimited earning potential. No interview required — apply now, only 3 positions left this week. Text us at the number below to get started today.`
+  },
+  {
+    label: 'Equipment fee / pay-to-start',
+    company: 'BrightPath Data Solutions',
+    apply: 'careers@brightpath-jobs.net',
+    source: 'Found via a text message',
+    text: `Data Entry Specialist — Earn $500/day, No Experience Needed\n\nBe your own boss! This is a dynamic self-starter opportunity with unlimited income potential. To begin, you'll need to purchase a starter kit ($199) which includes your training materials and account activation. Once your $199 activation fee is received, you'll be onboarded within 24 hours. Apply immediately — limited spots available.`
+  },
+  {
+    label: 'Ordinary, low-flag posting',
+    company: 'Meridian Analytics',
+    apply: 'jobs@meridiananalytics.com',
+    source: "Company's own careers page",
+    text: `Senior Data Analyst — Meridian Analytics (Req #2291)\n\nWe're hiring a Senior Data Analyst to join our 8-person Insights team, reporting to the Director of Analytics. You'll own quarterly reporting, build dashboards in Looker, and partner with Product on experiment design. Requirements: 4+ years in analytics, SQL fluency, Python a plus. Salary range: $110,000-$135,000 base, plus benefits. Hybrid, 3 days/week in our Denver office. Interview process: recruiter call, hiring manager call, technical exercise, final panel — all conducted live over video. Apply via the link below or email us directly with questions.`
+  }
+];
+
+function renderExampleChips(){
+  const row = document.getElementById('examplesRow');
+  const isMsg = currentMode() === 'message';
+  const list = isMsg ? messageExamples : postingExamples;
+  row.querySelectorAll('.chip-btn').forEach(b => b.remove());
+  list.forEach((ex, idx) => {
+    const btn = document.createElement('button');
+    btn.className = 'chip-btn';
+    btn.dataset.ex = idx;
+    btn.textContent = ex.label;
+    btn.addEventListener('click', () => {
+      if(isMsg){
+        document.getElementById('msgText').value = ex.text;
+        document.getElementById('companyName').value = ex.company;
+        document.getElementById('senderEmail').value = ex.email;
+      } else {
+        document.getElementById('postingText').value = ex.text;
+        document.getElementById('postingCompanyName').value = ex.company;
+        document.getElementById('postingApplyContact').value = ex.apply;
+        document.getElementById('postingSource').value = ex.source;
+      }
+    });
+    row.appendChild(btn);
   });
+}
+
+// ---------- Mode toggle ----------
+function currentMode(){
+  const el = document.querySelector('input[name="checkMode"]:checked');
+  return el ? el.value : 'message';
+}
+
+function applyMode(){
+  const isMsg = currentMode() === 'message';
+  document.getElementById('messagePanel').style.display = isMsg ? 'block' : 'none';
+  document.getElementById('postingPanel').style.display = isMsg ? 'none' : 'block';
+  document.getElementById('titleEl').textContent = isMsg ? 'Recruiter Message Sanity Check' : 'Job Posting Sanity Check';
+  document.getElementById('subEl').textContent = isMsg
+    ? 'Paste the InMail or message below. This flags known scam patterns — it doesn\u2019t prove someone is fake, and a clean result doesn\u2019t prove someone is real.'
+    : 'Paste the job posting below. This flags known scam-listing patterns — it doesn\u2019t prove a posting is fake, and a clean result doesn\u2019t prove it\u2019s real.';
+  document.getElementById('caseNoEl').innerHTML = isMsg ? 'FORM RM-1<br>Sanity check, not a verdict' : 'FORM JP-1<br>Sanity check, not a verdict';
+  // Reset the report panel to its empty state when switching modes, since a message-mode
+  // report showing while posting-mode inputs are visible (or vice versa) would be confusing.
+  document.getElementById('emptyState').style.display = 'block';
+  document.getElementById('reportBody').style.display = 'none';
+  renderExampleChips();
+}
+
+document.querySelectorAll('input[name="checkMode"]').forEach(el => {
+  el.addEventListener('change', applyMode);
 });
 
-// ---------- Checklist definition ----------
-const profileChecks = [
+// ---------- Checklist definition (Recruiter Message mode) ----------
+const messageChecks = [
   { id:'newProfile', label:'Profile was created recently (within the last 6 months)', weight:10 },
   { id:'fewConnections', label:'Fewer than ~50 connections', weight:10 },
   { id:'noBadge', label:'No verification badge (ID, employer, or Clear/Entra verification)', weight:5 },
@@ -666,21 +814,45 @@ const profileChecks = [
   { id:'noActivity', label:'Little to no posting or comment history', weight:7 },
 ];
 
-const checklistEl = document.getElementById('checklist');
-profileChecks.forEach(c => {
-  const row = document.createElement('div');
-  row.className = 'checkbox-row';
-  let linksHtml = '';
-  if(c.links && c.links.length){
-    const linkTags = c.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.text}</a>`).join(' \u00b7 ');
-    linksHtml = `<div class="checklist-links">Optional \u2014 check quickly: ${linkTags}</div>`;
-  }
-  row.innerHTML = `<input type="checkbox" id="${c.id}"><div><label for="${c.id}">${c.label}</label>${linksHtml}</div>`;
-  checklistEl.appendChild(row);
-});
+function renderChecklist(checks, containerEl){
+  checks.forEach(c => {
+    const row = document.createElement('div');
+    row.className = 'checkbox-row';
+    let linksHtml = '';
+    if(c.links && c.links.length){
+      const linkTags = c.links.map(l => `<a href="${l.url}" target="_blank" rel="noopener">${l.text}</a>`).join(' \u00b7 ');
+      linksHtml = `<div class="checklist-links">Optional \u2014 check quickly: ${linkTags}</div>`;
+    }
+    row.innerHTML = `<input type="checkbox" id="${c.id}"><div><label for="${c.id}">${c.label}</label>${linksHtml}</div>`;
+    containerEl.appendChild(row);
+  });
+}
 
-// ---------- Text pattern definitions ----------
-const patterns = [
+renderChecklist(messageChecks, document.getElementById('checklist'));
+
+// ---------- Checklist definition (Job Posting mode) ----------
+const postingChecks = [
+  { id:'p_evergreen', label:'Listing has been up, or has been reposted/renewed, for 60+ days', weight:15 },
+  { id:'p_duplicateText', label:'The exact wording of this listing appears verbatim for a different company (search a distinctive sentence in quotes to check)', weight:25, optional:true,
+    links:[
+      {text:'Google (search a sentence in quotes)', url:'https://www.google.com/'},
+    ] },
+  { id:'p_noHiringManager', label:'No specific team, department, or hiring manager is named anywhere', weight:10 },
+  { id:'p_thinPresence', label:'Company has little to no independent online presence (no reviews, thin/new LinkedIn page, no verifiable official website)', weight:20, optional:true,
+    links:[
+      {text:'Glassdoor', url:'https://www.glassdoor.com/'},
+      {text:'Indeed Company Reviews', url:'https://www.indeed.com/companies'},
+    ] },
+  { id:'p_noDeadline', label:'No application deadline, ever — an "evergreen" listing that never closes', weight:8 },
+  { id:'p_chatOnly', label:'Entire interview process described as text/chat-based, with no live call or video ever offered', weight:15 },
+  { id:'p_notOnCareersPage', label:'Not found on the company\u2019s own official careers page when checked directly', weight:20, optional:true },
+  { id:'p_noReviews', label:'No employee reviews for this company on Glassdoor or Indeed at all', weight:10, optional:true },
+];
+
+renderChecklist(postingChecks, document.getElementById('postingChecklist'));
+
+// ---------- Text pattern definitions (Recruiter Message mode) ----------
+const messagePatterns = [
   {
     id:'offPlatform', label:'Pushes the conversation to WhatsApp, Telegram, Signal, or a similar app',
     why:'Legitimate corporate recruiters use company email and internal scheduling tools, not consumer messaging apps.',
@@ -767,50 +939,120 @@ const patterns = [
   },
 ];
 
-// ---------- Custom phrases ----------
+// ---------- Text pattern definitions (Job Posting mode) ----------
+const postingPatterns = [
+  {
+    id:'p_equipmentFee', label:'Requires purchasing your own equipment, software, or a starter kit before you begin',
+    why:'Legitimate employers provide or reimburse necessary equipment through payroll/expense systems, not an upfront personal purchase.',
+    severity:'high', weight:30,
+    regex:/\b(purchase (?:your own )?equipment|buy (?:your own )?(?:laptop|equipment|starter kit)|starter kit fee|equipment deposit)\b/gi
+  },
+  {
+    id:'p_feeToStart', label:'Mentions a processing fee, registration fee, training fee, or deposit to start',
+    why:'A real employer never charges a candidate money to begin working.',
+    severity:'high', weight:30,
+    regex:/\b(processing fee|registration fee|training fee|activation fee|deposit required|background check fee)\b/gi
+  },
+  {
+    id:'p_reshipping', label:'Describes receiving and reshipping packages, or processing/forwarding payments, as the job itself',
+    why:'This is one of the most common scam-job structures — "reshipping" and "payment processing" roles are frequently used for money laundering or fraud, and the "employee" often ends up legally liable.',
+    severity:'high', weight:35,
+    regex:/\b(reship(?:ping)?|forward(?:ing)? packages|process(?:ing)? payments? (?:on our behalf|for us)|receive and (?:ship|send) (?:packages|items))\b/gi
+  },
+  {
+    id:'p_noExperienceHighPay', label:'Advertises unusually high pay with no experience or skills required',
+    why:'Inflated pay for minimal-to-no qualifications is a classic lure; verify independently before engaging further.',
+    severity:'med', weight:20,
+    regex:/\$\s?\d{2,}(?:,\d{3})*\s?(?:\/|per\s)(?:hour|hr|day)\b.{0,60}(?:no experience|no skills|no experience necessary|training provided)|no experience.{0,40}\$\s?\d{2,}/gis
+  },
+  {
+    id:'p_financialInfoUpfront', label:'Application itself asks for banking details, SSN, or ID copies before any interview',
+    why:'Real employers collect this only after a signed offer, through secure onboarding systems, not in a job application.',
+    severity:'high', weight:30,
+    regex:/\b(bank account|routing number|social security|ssn|wire transfer|bank details|passport (?:number|copy))\b/gi
+  },
+  {
+    id:'p_offPlatformApply', label:'Asks you to apply or respond via WhatsApp, Telegram, or a personal text message instead of a normal application process',
+    why:'Legitimate postings route applications through an ATS, company careers page, or verifiable job board — not a personal messaging app.',
+    severity:'high', weight:20,
+    regex:/\b(apply (?:via|by texting|by messaging) (?:whatsapp|telegram|text)|text (?:us|me) to apply)\b/gi
+  },
+  {
+    id:'p_urgencyPosting', label:'Uses pressure or urgency language ("apply immediately," "only X spots left")',
+    why:'Urgency discourages the careful checking a real opening can withstand.',
+    severity:'low', weight:8,
+    regex:/\b(apply (?:now|immediately|today)|urgent(?:ly)? hiring|only \d+ (?:spots|positions|openings) left|hiring immediately)\b/gi
+  },
+  {
+    id:'p_vagueButtery', label:'Uses vague, buzzword-heavy language with no concrete responsibilities ("dynamic self-starter," "unlimited earning potential")',
+    why:'Real postings describe actual day-to-day work. Buzzword-only listings are often templated across many fake postings.',
+    severity:'low', weight:8,
+    regex:/\b(unlimited earning potential|be your own boss|dynamic self-starter|work from anywhere, anytime|flexible hours, unlimited income)\b/gi
+  },
+  {
+    id:'p_freeEmailApply', label:'Application/contact is a free personal email address rather than a company domain',
+    why:'Legitimate employers use a company email domain for hiring correspondence.',
+    severity:'med', weight:15,
+    regex:/\b[\w.+-]+@(?:gmail|yahoo|hotmail|outlook|icloud)\.com\b/gi
+  },
+  {
+    id:'p_cryptoPosting', label:'Mentions cryptocurrency, trading, or investment as part of the role or how you\u2019ll be paid',
+    why:'Crypto-linked "jobs" are a well-documented scam category, often layered on top of a fake posting.',
+    severity:'high', weight:25,
+    regex:/\b(crypto(?:currency)?|bitcoin|usdt|trading (?:platform|account)|invest(?:ment)? (?:account|opportunity))\b/gi
+  },
+];
+
+// ---------- Custom phrases (generalized for both modes) ----------
 let customPhrases = [];
-const customChipList = document.getElementById('customChipList');
-document.getElementById('addCustomBtn').addEventListener('click', addCustomPhrase);
-document.getElementById('customPhraseInput').addEventListener('keydown', e => {
-  if(e.key === 'Enter'){ e.preventDefault(); addCustomPhrase(); }
-});
-function addCustomPhrase(){
-  const input = document.getElementById('customPhraseInput');
-  const val = input.value.trim();
-  if(!val) return;
-  customPhrases.push(val);
-  input.value = '';
-  renderCustomChips();
-}
-function renderCustomChips(){
-  customChipList.innerHTML = '';
-  customPhrases.forEach((phrase, idx) => {
-    const chip = document.createElement('div');
-    chip.className = 'custom-chip';
-    chip.innerHTML = `<span>${escapeHtml(phrase)}</span><button data-idx="${idx}">\u00d7</button>`;
-    chip.querySelector('button').addEventListener('click', () => {
-      customPhrases.splice(idx,1);
-      renderCustomChips();
+let postingCustomPhrases = [];
+
+function setupCustomPhraseBox(inputId, addBtnId, listId, phrasesArray){
+  const chipList = document.getElementById(listId);
+  function render(){
+    chipList.innerHTML = '';
+    phrasesArray.forEach((phrase, idx) => {
+      const chip = document.createElement('div');
+      chip.className = 'custom-chip';
+      chip.innerHTML = `<span>${escapeHtml(phrase)}</span><button data-idx="${idx}">\u00d7</button>`;
+      chip.querySelector('button').addEventListener('click', () => {
+        phrasesArray.splice(idx,1);
+        render();
+      });
+      chipList.appendChild(chip);
     });
-    customChipList.appendChild(chip);
+  }
+  function add(){
+    const input = document.getElementById(inputId);
+    const val = input.value.trim();
+    if(!val) return;
+    phrasesArray.push(val);
+    input.value = '';
+    render();
+  }
+  document.getElementById(addBtnId).addEventListener('click', add);
+  document.getElementById(inputId).addEventListener('keydown', e => {
+    if(e.key === 'Enter'){ e.preventDefault(); add(); }
   });
 }
+setupCustomPhraseBox('customPhraseInput', 'addCustomBtn', 'customChipList', customPhrases);
+setupCustomPhraseBox('postingCustomPhraseInput', 'postingAddCustomBtn', 'postingCustomChipList', postingCustomPhrases);
 
-// ---------- Domain check ----------
+// ---------- Domain check (reused by both modes) ----------
 function checkDomainMismatch(company, email){
   if(!company || !email) return null;
   const emailMatch = email.match(/@([\w.-]+)/);
   if(!emailMatch) return null;
   const domain = emailMatch[1].toLowerCase();
   const freeProviders = ['gmail.com','yahoo.com','hotmail.com','outlook.com','icloud.com'];
-  if(freeProviders.includes(domain)) return null; // already caught by freeEmailAsk pattern
+  if(freeProviders.includes(domain)) return null; // already caught by the free-email pattern
   const domainCore = domain.split('.')[0].replace(/[^a-z0-9]/g,'');
   const companyCore = company.toLowerCase().replace(/[^a-z0-9]/g,'');
   if(companyCore.length > 2 && !domainCore.includes(companyCore.slice(0, Math.min(6, companyCore.length))) && !companyCore.includes(domainCore.slice(0, Math.min(6, domainCore.length)))){
     return {
       id: 'domainMismatch',
-      label: `Sender's email domain ("${domain}") doesn't obviously match "${company}"`,
-      why: 'Confirm the real corporate domain on the company\u2019s official website before replying — scammers often register a lookalike domain.',
+      label: `Email domain ("${domain}") doesn't obviously match "${company}"`,
+      why: 'Confirm the real corporate domain on the company\u2019s official website before proceeding — scammers often register a lookalike domain.',
       severity: 'med', weight: 15, quotes: [email]
     };
   }
@@ -846,14 +1088,50 @@ function checkNoRoleSpecified(text){
   };
 }
 
+// ---------- Structural checks (Job Posting mode) ----------
+function checkNoSalaryRange(text){
+  if(text.trim().length < 60) return null;
+  if(/\$\s?\d|salary range|compensation range|pay range|\d+k\s?-\s?\d+k/i.test(text)) return null;
+  return {
+    id: 'p_noSalaryRange',
+    label: 'No salary or pay range is given anywhere in the posting',
+    why: 'Many jurisdictions now require pay-range disclosure on job postings. Its total absence isn\u2019t proof of a scam by itself, but it\u2019s worth noting alongside other signals.',
+    severity: 'low', weight: 6, quotes: []
+  };
+}
+
+function checkNoResponsibilities(text){
+  if(text.trim().length < 60) return null;
+  if(/\b(responsib|you will|day.to.day|duties|you\u2019ll (?:be )?(?:responsible|working|managing|leading|handling))\b/i.test(text)) return null;
+  return {
+    id: 'p_noResponsibilities',
+    label: 'No actual day-to-day responsibilities or duties are described',
+    why: 'Real postings describe real work. A listing that\u2019s all pitch and no substance about the actual job is a common template-scam pattern.',
+    severity: 'med', weight: 12, quotes: []
+  };
+}
+
+function checkNoCompanyNamedPosting(company, text){
+  if(company && company.trim()) return null;
+  if(COMPANY_ENTITY_RE.test(text)) return null;
+  if(text.trim().length < 40) return null;
+  return {
+    id: 'p_noCompanyNamed',
+    label: 'No specific company or employer is named anywhere in the posting itself',
+    why: 'A real posting identifies the employer (or is clearly attached to one via the platform it\u2019s on). One that never names an employer gives you nothing to independently verify.',
+    severity: 'med', weight: 12, quotes: []
+  };
+}
+
 // ---------- Analysis ----------
-document.getElementById('analyzeBtn').addEventListener('click', runAnalysis);
+document.getElementById('analyzeBtn').addEventListener('click', runMessageAnalysis);
+document.getElementById('postingAnalyzeBtn').addEventListener('click', runPostingAnalysis);
 
 function escapeHtml(str){
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
 }
 
-function runAnalysis(){
+function runMessageAnalysis(){
   const text = document.getElementById('msgText').value.trim();
   const company = document.getElementById('companyName').value.trim();
   const senderEmail = document.getElementById('senderEmail').value.trim();
@@ -867,7 +1145,7 @@ function runAnalysis(){
   const foundFlags = [];
   const matchRanges = [];
 
-  patterns.forEach(p => {
+  messagePatterns.forEach(p => {
     const re = new RegExp(p.regex.source, p.regex.flags);
     let m;
     const quotes = [];
@@ -914,7 +1192,7 @@ function runAnalysis(){
   }
 
   // Profile checklist contributions
-  profileChecks.forEach(c => {
+  messageChecks.forEach(c => {
     const box = document.getElementById(c.id);
     if(box && box.checked){
       score += c.weight;
@@ -929,14 +1207,99 @@ function runAnalysis(){
 
   const matchedIds = new Set(foundFlags.map(f=>f.id).filter(Boolean));
 
-  renderReport(score, foundFlags, text, matchRanges, company, matchedIds);
-  saveHistory(score, company, foundFlags.length);
+  saveHistory('message', score, company, foundFlags.length);
+  renderReport('message', score, foundFlags, text, matchRanges, company, matchedIds);
 }
 
-// ---------- Follow-up message builder ----------
-// Only offered in the "on the fence" caution band — a high-risk message doesn't
-// need a smarter reply, it needs to not be replied to; a low-risk one doesn't need one either.
-function buildFollowUpMessage(company, matchedIds){
+function runPostingAnalysis(){
+  const text = document.getElementById('postingText').value.trim();
+  const company = document.getElementById('postingCompanyName').value.trim();
+  const applyContact = document.getElementById('postingApplyContact').value.trim();
+
+  if(!text){
+    document.getElementById('postingText').focus();
+    return;
+  }
+
+  let score = 0;
+  const foundFlags = [];
+  const matchRanges = [];
+
+  postingPatterns.forEach(p => {
+    const re = new RegExp(p.regex.source, p.regex.flags);
+    let m;
+    const quotes = [];
+    let matchedOnce = false;
+    while((m = re.exec(text)) !== null){
+      matchedOnce = true;
+      quotes.push(m[0]);
+      matchRanges.push({start:m.index, end:m.index + m[0].length, severity:p.severity});
+      if(m.index === re.lastIndex) re.lastIndex++;
+    }
+    if(matchedOnce){
+      score += p.weight;
+      foundFlags.push({id:p.id, label:p.label, why:p.why, severity:p.severity, quotes: [...new Set(quotes)].slice(0,3)});
+    }
+  });
+
+  // Custom phrases
+  postingCustomPhrases.forEach(phrase => {
+    const idx = text.toLowerCase().indexOf(phrase.toLowerCase());
+    if(idx !== -1){
+      score += 10;
+      matchRanges.push({start:idx, end:idx+phrase.length, severity:'med'});
+      foundFlags.push({label:`Matched your custom phrase: "${phrase}"`, why:'', severity:'med', quotes:[phrase]});
+    }
+  });
+
+  // Domain mismatch (using the apply-contact email, if one was given)
+  const domainFlag = checkDomainMismatch(company, applyContact);
+  if(domainFlag){
+    score += domainFlag.weight;
+    foundFlags.push(domainFlag);
+  }
+
+  // Structural absence checks
+  const noCompanyFlag = checkNoCompanyNamedPosting(company, text);
+  if(noCompanyFlag){
+    score += noCompanyFlag.weight;
+    foundFlags.push(noCompanyFlag);
+  }
+  const noRespFlag = checkNoResponsibilities(text);
+  if(noRespFlag){
+    score += noRespFlag.weight;
+    foundFlags.push(noRespFlag);
+  }
+  const noSalaryFlag = checkNoSalaryRange(text);
+  if(noSalaryFlag){
+    score += noSalaryFlag.weight;
+    foundFlags.push(noSalaryFlag);
+  }
+
+  // Listing checklist contributions
+  postingChecks.forEach(c => {
+    const box = document.getElementById(c.id);
+    if(box && box.checked){
+      score += c.weight;
+      foundFlags.push({label:c.label, why:'', severity: c.weight >= 20 ? 'high' : (c.weight >= 10 ? 'med' : 'low'), quotes: []});
+    }
+  });
+
+  score = Math.min(100, score);
+
+  const sevOrder = {high:0, med:1, low:2};
+  foundFlags.sort((a,b)=> sevOrder[a.severity]-sevOrder[b.severity]);
+
+  const matchedIds = new Set(foundFlags.map(f=>f.id).filter(Boolean));
+
+  saveHistory('posting', score, company, foundFlags.length);
+  renderReport('posting', score, foundFlags, text, matchRanges, company, matchedIds);
+}
+
+// ---------- Follow-up / next-steps builders ----------
+// Only offered in the "on the fence" caution band — a high-risk result doesn't
+// need a smarter reply, it needs to not be engaged with; a low-risk one doesn't need one either.
+function buildMessageFollowUp(company, matchedIds){
   const lines = [];
   lines.push(`Thanks for reaching out${company ? ' about the role at ' + company : ''} \u2014 I'd like to look into this properly before going further. Could you send over a few things:`);
   lines.push('');
@@ -969,11 +1332,32 @@ function buildFollowUpMessage(company, matchedIds){
   return lines.join('\n');
 }
 
+function buildPostingFollowUp(company, matchedIds){
+  const lines = [];
+  lines.push(`Before applying${company ? ' to this posting at ' + company : ''}, verify these directly rather than taking the listing at face value:`);
+  lines.push('');
+  lines.push(`- Search for this exact company${company ? ' ("' + company + '")' : ''} on the company\u2019s own official website, and confirm this posting (or an equivalent one) appears on their real careers page`);
+  lines.push('- Search the company name on Glassdoor and Indeed for reviews \u2014 a company with real employees usually has at least some review history');
+  lines.push('- Copy a distinctive sentence from the posting and search it in quotes \u2014 if the exact wording appears for several unrelated companies, it\u2019s a templated/scraped listing');
+
+  if(matchedIds.has('p_freeEmailApply') || matchedIds.has('domainMismatch')){
+    lines.push('- Confirm any application correspondence is coming from a real company email domain, not a free personal one');
+  }
+  if(matchedIds.has('p_offPlatformApply')){
+    lines.push('- Be wary of applying or "confirming interest" via WhatsApp/Telegram/text \u2014 legitimate employers use a normal application system');
+  }
+
+  lines.push('');
+  lines.push('Do not pay any fee, purchase any equipment, or provide banking/ID details at the application stage \u2014 no legitimate employer requires this before a signed offer.');
+
+  return lines.join('\n');
+}
+
 let lastReportSummary = '';
 
 let lastFollowUpText = '';
 
-function renderReport(score, flags, text, matchRanges, company, matchedIds){
+function renderReport(mode, score, flags, text, matchRanges, company, matchedIds){
   document.getElementById('emptyState').style.display = 'none';
   const body = document.getElementById('reportBody');
   body.style.display = 'block';
@@ -990,10 +1374,20 @@ function renderReport(score, flags, text, matchRanges, company, matchedIds){
     verdictText = 'Low signal detected'; verdictClass = 'green'; barColor = 'var(--green)';
   }
 
+  const isMsg = mode === 'message';
+  const subjectLabel = isMsg ? 'claimed employer' : 'company named';
+  const scoreCaptionText = isMsg
+    ? 'Pattern match strength — how much this message overlaps with known scam wording, not a probability of fraud'
+    : 'Listing risk signal strength — how much this posting overlaps with known scam-listing patterns, not a probability of fraud';
+  document.getElementById('scoreCaption').textContent = scoreCaptionText;
+  document.getElementById('annotatedLabel').textContent = isMsg
+    ? 'Message with flagged phrases marked'
+    : 'Posting with flagged phrases marked';
+
   document.getElementById('stampEl').className = 'stamp ' + verdictClass;
   document.getElementById('stampEl').textContent = verdictText;
 
-  scoreLine.textContent = `Pattern match strength: ${score} / 100` + (company ? ` — claimed employer: ${company}` : '');
+  scoreLine.textContent = `${isMsg ? 'Pattern match strength' : 'Listing risk signal strength'}: ${score} / 100` + (company ? ` — ${subjectLabel}: ${company}` : '');
   scoreBar.style.width = score + '%';
   scoreBar.style.background = barColor;
 
@@ -1002,8 +1396,15 @@ function renderReport(score, flags, text, matchRanges, company, matchedIds){
 
   const followUpBox = document.getElementById('followUpBox');
   if(verdictClass === 'amber'){
-    lastFollowUpText = buildFollowUpMessage(company, matchedIds || new Set());
+    lastFollowUpText = isMsg
+      ? buildMessageFollowUp(company, matchedIds || new Set())
+      : buildPostingFollowUp(company, matchedIds || new Set());
     document.getElementById('followUpText').textContent = lastFollowUpText;
+    document.getElementById('followUpLabel').textContent = isMsg ? 'Follow-up message to send' : 'Verify before you apply';
+    document.getElementById('followUpNote').textContent = isMsg
+      ? 'This lands in the caution range — not clearly a scam, not clearly clean. Before sharing anything else, send something that asks for the specifics a real recruiter can always provide. A vague or evasive reply is itself informative.'
+      : 'This lands in the caution range — not clearly a scam, not clearly clean. Before applying or engaging further, verify the things below independently rather than taking the listing at face value.';
+    document.getElementById('copyFollowUpBtn').textContent = isMsg ? 'Copy follow-up message' : 'Copy verification checklist';
     followUpBox.style.display = 'block';
   } else {
     followUpBox.style.display = 'none';
@@ -1012,10 +1413,11 @@ function renderReport(score, flags, text, matchRanges, company, matchedIds){
 
   const flagListEl = document.getElementById('flagList');
   flagListEl.innerHTML = '';
-  let summaryLines = [`Recruiter message check — verdict: ${verdictText} (pattern match strength ${score}/100)`, company ? `Claimed employer: ${company}` : '', ''];
+  const checkLabel = isMsg ? 'Recruiter message check' : 'Job posting check';
+  let summaryLines = [`${checkLabel} — verdict: ${verdictText} (${isMsg ? 'pattern match strength' : 'listing risk signal strength'} ${score}/100)`, company ? `${subjectLabel.charAt(0).toUpperCase()+subjectLabel.slice(1)}: ${company}` : '', ''];
 
   if(flags.length === 0){
-    flagListEl.innerHTML = `<div class="no-flags">No known scam patterns matched in the text or checklist. That's a good sign, but it doesn't confirm the sender is legitimate — still verify through the company's own site or careers page.</div>`;
+    flagListEl.innerHTML = `<div class="no-flags">No known scam patterns matched in the text or checklist. That's a good sign, but it doesn't confirm ${isMsg ? 'the sender is legitimate' : 'the listing is legitimate'} — still verify through the company's own site or careers page.</div>`;
     summaryLines.push('No known scam patterns matched.');
   } else {
     flags.forEach(f => {
@@ -1062,7 +1464,9 @@ function renderReport(score, flags, text, matchRanges, company, matchedIds){
     annotatedEl.innerHTML = html;
   }
 
-  body.scrollIntoView({behavior:'smooth', block:'nearest'});
+  if(typeof body.scrollIntoView === 'function'){
+    body.scrollIntoView({behavior:'smooth', block:'nearest'});
+  }
 }
 
 document.getElementById('copyBtn').addEventListener('click', async () => {
@@ -1093,9 +1497,10 @@ document.getElementById('copyFollowUpBtn').addEventListener('click', async () =>
 // ---------- History (in-memory, with manual export/import — no browser storage APIs used) ----------
 let historyEntries = [];
 
-function saveHistory(score, company, flagCount){
+function saveHistory(mode, score, company, flagCount){
   historyEntries.unshift({
     ts: new Date().toISOString(),
+    mode: mode || 'message',
     score, company: company || '(not specified)', flagCount
   });
   historyEntries = historyEntries.slice(0, 25);
@@ -1106,6 +1511,10 @@ function verdictBadge(score){
   if(score >= 55) return {cls:'red', label:'High'};
   if(score >= 25) return {cls:'amber', label:'Caution'};
   return {cls:'green', label:'Low'};
+}
+
+function modeTag(mode){
+  return mode === 'posting' ? 'POSTING' : 'MESSAGE';
 }
 
 function renderHistory(entries){
@@ -1131,7 +1540,7 @@ function renderHistory(entries){
     const dateStr = d.toLocaleDateString(undefined, {month:'short', day:'numeric'}) + ' ' + d.toLocaleTimeString(undefined,{hour:'numeric', minute:'2-digit'});
     const row = document.createElement('div');
     row.className = 'history-item';
-    row.innerHTML = `<span>${escapeHtml(e.company)} <span class="history-meta">— ${dateStr}</span></span><span class="history-badge ${badge.cls}">${badge.label} · ${e.score}</span>`;
+    row.innerHTML = `<span>[${modeTag(e.mode)}] ${escapeHtml(e.company)} <span class="history-meta">— ${dateStr}</span></span><span class="history-badge ${badge.cls}">${badge.label} · ${e.score}</span>`;
     listEl.appendChild(row);
   });
 }
@@ -1176,6 +1585,7 @@ document.getElementById('loadHistoryInput').addEventListener('change', (e) => {
 
 // Initial render
 renderHistory(historyEntries);
+applyMode();
 </script>
 </body>
 </html>
