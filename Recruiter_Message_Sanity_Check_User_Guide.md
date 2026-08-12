@@ -1,119 +1,122 @@
-# Recruiter Message Sanity Check — User Guide
+# Recruiter Message & Job Posting Sanity Check
 
-This guide covers how to use the Recruiter Message Sanity Check tool to screen suspicious recruiter messages — LinkedIn InMails, emails, or any unsolicited job outreach — before you respond to them.
+*User Guide*
 
-## 1. What This Tool Does
+This tool is a single web page (recruiter-message-checker.html) that screens either a suspicious recruiter message or a job posting against known scam patterns — entirely in your browser. Unlike every other tool in this family, it doesn't generate a prompt for Claude: paste your text, click Run the check, and you get a scored, explained result immediately, with nothing sent anywhere.
 
-Fake recruiter messages on LinkedIn and email have become increasingly common. This tool scans a message you paste in and checks it against a list of wording patterns that show up again and again in these scams — things like being pushed to WhatsApp, vague job titles, requests for upfront fees, or asks for banking details.
+## Claude Settings You'll Need Before You Start
 
-It also flags what's *missing*, not just what's present. A message that never names an employer, never states a job title, or routes the whole opportunity through an unnamed "friend of a friend" scores as suspicious even if it avoids obviously scammy language — because a real recruiter always has an answer for who they work for and what the role is.
+None. This tool runs entirely client-side — no web search, no code execution, no Claude conversation at all. That's a deliberate design choice: the check is fast and repeatable enough that routing it through a chat would only slow it down.
 
-It returns a plain-language verdict — Low, Caution, or High — along with a pattern match strength score out of 100. This is a starting point for your own judgment, not a final answer.
+## 1. How This Fits With the Other Tools
 
-## 2. Getting Started
+This is one of two "ongoing" tools in the suite (the other is LinkedIn Article Share Builder) — not a step in the four-tool research-to-outreach funnel. Use it any time, whether or not you're actively job hunting: whenever a recruiter message or a job posting feels off.
 
-1. Open `recruiter-message-checker.html` in any web browser (Chrome, Safari, Edge, or Firefox). Double-click the file, or drag it into an open browser window.
-2. No login, install, or internet connection is required to run a check — everything happens locally in your browser.
-3. To see how it works before using a real message, click one of the three sample buttons at the top of the page to load an example.
+## 2. The Mode Toggle
 
-## 3. Running a Check
+At the top of the page: **Checking a: Recruiter Message / Job Posting**. This switches the entire input panel, checklist, and pattern library underneath it — not just a couple of fields. The two modes check genuinely different things:
 
-**Step 1 — Paste the message**
-Copy the full text of the recruiter message and paste it into the text box labeled "Paste the message text." Include as much of the original message as you can.
+- **Recruiter Message mode** asks whether the *person or account contacting you* is likely legitimate.
+- **Job Posting mode** asks whether the *listing itself* is likely legitimate.
 
-**Step 2 — Add what you know**
-If known, enter the company the sender claims to represent and the sender's email address. These two fields let the tool flag a mismatch between the sender's email domain and the claimed company.
+A message can come from a real recruiter about a fake listing, or a fake account can forward a real listing — they're independent questions, which is why each mode gets its own full field set rather than a handful of shared fields with the rest bolted on. Switching modes resets the results panel to its empty state, since a message-mode report showing while posting-mode inputs are visible would be confusing.
 
-**Step 3 — Check off any profile red flags**
-Some warning signs can't be read from the message text alone. Before running the check, look at the sender's LinkedIn profile and tick any that apply:
+## 3. Recruiter Message Mode
 
-- Profile created recently (within the last 6 months)
-- Fewer than about 50 connections
-- No verification badge on the profile
-- Sender's headline/profession has nothing to do with recruiting or the pitch (e.g. a nurse or engineer suddenly offering an unrelated "project")
-- Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin) — optional; the tool links to Is It AI? and Quillbot's AI Image Detector, two free no-signup checkers, so you can test the photo without leaving the page
-- Reverse image search shows the photo used elsewhere / on a stock site — optional; the tool provides one-click links to Google Images, TinEye, and Bing Visual Search so you can check without leaving the page
-- Not listed as an employee on the company's own LinkedIn page
-- Few or no mutual connections in your industry
-- Little to no posting or comment history
+### Inputs
 
-*How to check if someone is a real listed employee on LinkedIn:*
+- **The message text** — paste the full InMail or message.
+- **Company they claim to represent** (optional) — used for a domain-mismatch check against the sender's email.
+- **Sender's email** (optional) — if given alongside the company name, the tool checks whether the email domain plausibly matches the claimed employer.
 
-1. Search for the company by name in LinkedIn's top search bar and open their official company page — not a person's profile.
-2. Click the **People** tab near the top of the company page. This shows everyone who currently lists that company in their LinkedIn profile.
-3. Use the "Search by name" box on the People tab to search the sender's name. A genuine current employee will show up here.
-4. No result isn't automatic proof either way — it could mean they don't work there, or (rarely) their privacy settings hide them from the list. Weigh it alongside the other checklist items rather than on its own.
-5. Also check the sender's own profile: a verified company listing in their Experience section shows the company's logo and links to the real company page. Plain, unlinked text is a weaker, self-reported claim — anyone can type any company name into that field.
+### Profile signals checklist
 
-**Step 4 — Run the check**
-Click "Run the check." Results appear on the right within a second or two.
+Manual checkboxes for things the tool can't read from the message text alone: a recently created profile, fewer than ~50 connections, no verification badge, a profession unrelated to recruiting or the pitch, a generic/AI-generated-looking photo, not listed as an employee on the company's own LinkedIn page, few mutual connections, little posting history. The photo-related checks link out to free tools (Google Images, TinEye, Bing Visual Search for reverse image search; Is It AI?, Quillbot for AI-detection) so you can check without leaving the page — these are clearly marked optional and never auto-run; you decide whether to click through.
 
-## 4. Understanding Your Results
+### Text patterns checked automatically
 
-The report shows three things:
+The message text itself is scanned for known scam-message patterns: pushing the conversation off-platform (WhatsApp/Telegram/Signal), vague or "under discussion" title/pay/team, asking for personal contact details before any formal process, an unnamed intermediary you can't verify, urgency language, upfront fee requests, requests for financial information, generic flattery with no specifics, a generic "opportunity" pitch, being asked to download an app, cryptocurrency mentions, unrealistically high pay, and communicating from a free personal email address.
 
-- **A stamped verdict** — Low signal detected, Proceed with caution, or High risk.
-- **A pattern match strength score** out of 100 — how closely the message matches known scam wording. This is not a statistical probability of fraud; no dataset exists to calculate a true probability honestly.
-- **A flag list** — every match found, labeled by severity (High/Medium/Low), with a short note on why it matters and the exact phrase that triggered it.
+### Structural checks
 
-Below the flag list, the full message reappears with flagged phrases highlighted in place, so you can see exactly what raised concern in context.
+Two checks flag what's *missing* rather than present: no company or employer named anywhere in the message, and no job title or role type mentioned at all. Absence is often more telling than presence — a message that avoids naming anything concrete is a common way to keep a pitch vague enough to fit any recipient.
 
-If the result lands in the Proceed with caution range, a fourth block appears above the highlighted message: a ready-to-send follow-up message. See Section 6.
+## 4. Job Posting Mode
 
-## 5. If a Message Scores Caution or High
+### Inputs
 
-At a score of 25 or above, a "Report this" section appears with direct links to:
+- **The posting text** — paste the full listing.
+- **Company the posting is for** (optional) — used for the same domain-mismatch logic as message mode, checked against the apply-contact field below.
+- **How to apply — email or link** (optional) — if the posting gives an application email, the tool checks whether its domain plausibly matches the claimed company.
+- **Where you found this posting** (optional, for your own reference) — company's own careers page, LinkedIn, Indeed, a text message, etc.
 
-- LinkedIn's reporting flow, for fake profiles or messages
-- The FBI's Internet Crime Complaint Center (IC3.gov)
-- The FTC's ReportFraud.ftc.gov
+### Listing signals checklist
 
-Avoid providing any personal, financial, or banking information in the meantime, regardless of how the message is framed.
+Manual checkboxes for things the tool can't verify automatically: the listing has been active or reposted for 60+ days, the exact wording appears verbatim for a different company (check by searching a distinctive sentence in quotes), no specific team or hiring manager is named, the company has little to no independent online presence (no reviews, thin LinkedIn page, no verifiable official website), no application deadline ever (an "evergreen" listing), the interview process is described as entirely text/chat-based with no live call ever offered, the listing isn't found on the company's own official careers page when checked directly, and no employee reviews exist on Glassdoor or Indeed at all. Several of these link out to free tools (Google for text-duplication search, Glassdoor/Indeed for reviews) — same rule as message mode: optional, never auto-run.
 
-## 6. Follow-Up Message (Caution-Range Results Only)
+### Text patterns checked automatically
 
-When a result lands in the Proceed with caution range (25–54), the report includes a suggested follow-up message and a **Copy follow-up message** button.
+The posting text is scanned for known scam-listing patterns: requiring you to purchase your own equipment or a "starter kit," any processing/registration/training fee or deposit to start, descriptions of receiving-and-reshipping packages or processing payments as the job itself (a well-documented scam category), unusually high pay advertised alongside "no experience necessary," requests for banking details/SSN/ID copies at the application stage, being asked to apply via WhatsApp/Telegram/text instead of a normal process, urgency language, vague buzzword-heavy language with no concrete responsibilities, a free personal email as the application contact, and cryptocurrency/trading/investment mentions.
 
-This is not a verification tool — it's wording you can send back to the sender to ask for the specifics a real recruiter can always provide, without volunteering any personal information of your own:
+### Structural checks
 
-- The full, official company name
-- A link to the job posting, or a requisition/job ID
-- The job title and team the role sits on
+Three checks flag what's missing: no salary or pay range anywhere in the posting, no actual day-to-day responsibilities or duties described, and no specific company named (checked only when you haven't filled in the company field yourself and the text doesn't obviously name one).
 
-If the flagged patterns included an unnamed intermediary (a "friend," "colleague," or similar go-between) or a mismatch between the sender's email and their claimed employer, the suggested message adjusts to ask for those specifically — for example, a way to verify the intermediary directly, or confirmation that correspondence is coming from a company email address.
+## 5. Custom Red Flags (Both Modes)
 
-This feature does not appear on High risk results. At that score, the recommended move isn't a more careful reply — it's to stop engaging and use the reporting links in Section 5 instead. A vague or evasive response to the follow-up message is itself informative, but a smooth, professional-sounding non-answer doesn't clear a sender either — keep verifying independently through the company's own site.
+Each mode has its own custom-phrase box — add a phrase you've personally seen in scam messages or postings, and it's checked in addition to the built-in list for that session. These are per-mode and don't carry over between message and posting checks.
 
-## 7. Other Features
+## 6. Reading the Result
 
-**Custom red flags**
-Add your own phrases under "Your own red flags" before running a check. These are checked in addition to the built-in list, for the current session only.
+- **Stamped verdict** — Low signal detected / Proceed with caution / High risk, based on a weighted score out of 100.
+- **Score and caption** — labeled "Pattern match strength" in message mode or "Listing risk signal strength" in posting mode, with an explicit note that this reflects overlap with known patterns, not a probability of fraud.
+- **Every flag found**, with severity (High/Medium/Low) and a plain-language explanation of why it matters, sorted highest severity first.
+- **The text itself, with flagged phrases highlighted in place** — labeled "Message with flagged phrases marked" or "Posting with flagged phrases marked" depending on mode.
+- **Reporting links** (score ≥ 25) — LinkedIn's report form, the FBI's IC3, and the FTC's ReportFraud site. These apply regardless of which mode flagged the result.
+- **A mode-appropriate next step** (caution range only, score 25-54) — see Section 7.
 
-**Copy or print your results**
-"Copy report" copies a plain-text summary — handy for pasting into an email to a friend or colleague. "Print / Save as PDF" generates a printable version.
+A score of 0 or a clean checklist doesn't confirm legitimacy, and a flagged result isn't proof of a scam. Always verify independently through the company's own careers page or domain before making a decision based on this tool alone.
 
-**Session history — download and reload**
-Every check run during the current session is logged at the bottom of the report panel (date, company, score). The tool uses no accounts or browser storage, so this list clears when the page closes — unless saved first:
+## 7. The Caution-Range Next Step
 
-1. Click **Download history (.json)** to save the session's log as a file.
-2. Next time, click **Load history file** and select that file to bring past results back into view.
+This only appears for results that land specifically in the "Proceed with caution" band (25-54) — not clearly clean, not clearly high-risk. The two modes generate genuinely different content here, both built from the specific flags that were actually raised for your input:
 
-## 8. Customizing the Pattern List
+- **Message mode — "Follow-up message to send":** a ready-to-copy reply asking the sender for the specifics a real recruiter can always provide (official company name, a link to the specific posting or a requisition ID, the job title and team) plus mode-specific asks if relevant flags fired (e.g. asking an unnamed intermediary for a way to verify them directly, or asking to keep communication on a company email rather than WhatsApp).
+- **Posting mode — "Verify before you apply":** a checklist of independent verification steps (confirm the posting on the company's own careers page, check Glassdoor/Indeed for reviews, search a distinctive sentence from the posting in quotes to check for duplication) plus a closing reminder never to pay a fee or share banking/ID details before a signed offer.
 
-All detection patterns live in a single array in the tool's source code, each with a label, an explanation, a severity, a score weight, and a matching rule. Anyone comfortable editing the HTML file directly can add, remove, or adjust entries there to tune detection over time.
+A high-risk result doesn't get either of these, on purpose — that result calls for disengaging, not a more carefully worded reply or a longer verification process.
 
-## 9. Limitations
+## 8. History
 
-- Regex-based matching will miss scams that avoid the specific wording checked for, and can occasionally flag legitimate messages using similar phrasing.
-- The domain-mismatch check is a rough heuristic and can misfire on abbreviated or rebranded company names.
-- The "no company named" and "no job title mentioned" checks look for absence, not presence — an unusually short but entirely legitimate message (for example, "Are you the Tom who spoke at the OT security conference last year?") can occasionally pick up a low-weight flag. These checks carry modest weight for that reason, and rarely push a score into High risk on their own.
-- The suggested follow-up message is a starting point for asking better questions, not a scam-detection tool in its own right — how someone responds still requires your own judgment.
-- This tool cannot confirm anyone's identity, employment, or a company's legitimacy — always verify independently through the company's official careers page or domain.
+Every check you run — either mode — is added to a running history list for the session, tagged `[MESSAGE]` or `[POSTING]` so a mixed session stays legible, with a color-coded verdict badge and score. History is in-memory only:
 
-## 10. Quick Reference
+- **Download history** saves it as a JSON file you can keep.
+- **Load history** lets you bring a previously downloaded file back in, appending it to whatever's already in the current session.
+- **Clear history** wipes the current session's list (does not affect any downloaded file).
 
-| Verdict | Score range | What it means |
-|---|---|---|
-| Low signal detected | 0–24 | Few or no known scam patterns matched. Still verify independently. |
-| Proceed with caution | 25–54 | Several patterns matched. A follow-up message is suggested (see Section 6). Slow down and verify before sharing any personal information. |
-| High risk | 55–100 | Strong overlap with known scam wording. Treat with significant skepticism and consider reporting. |
+Nothing is saved automatically, and nothing uses browser storage — closing the tab loses anything you haven't downloaded.
+
+## 9. Printing / Saving a Report
+
+The Print button opens your browser's print dialog with the input panels, mode toggle, and buttons hidden, showing just the case-file report — useful for keeping a record or sharing a specific result. Copy report copies a plain-text summary of the verdict, score, and flags to your clipboard.
+
+## 10. Try a Sample
+
+Three sample chips appear under the header, and they change depending on which mode you're in:
+
+- **Message mode:** a vague-title/WhatsApp-handoff message, an upfront-equipment-fee message, and an ordinary low-flag message from a real-looking recruiter.
+- **Posting mode:** a reshipping/evergreen-listing scam, an equipment-fee/pay-to-start scam, and an ordinary low-flag posting from a real-looking company.
+
+Each one fills in every relevant field so you can see how a full result looks before trying your own text.
+
+## 11. Quick Troubleshooting
+
+| Problem | Fix |
+|---|---|
+| Nothing happens when I click Run the check | The text box for the active mode needs something in it — an empty message or posting field won't run. |
+| Wrong panel is showing | Check the mode toggle at the top — switching modes swaps the entire input panel, not just a couple of fields. |
+| A checkbox item doesn't seem to affect the score | Some checklist items are marked "optional" with links to external verification tools — checking the box after you've verified externally is what contributes to the score, the links themselves don't auto-check anything. |
+| The follow-up/checklist box isn't showing | It only appears for results in the caution band (score 25-54) — a clean or high-risk result won't show it, by design. |
+| History disappeared | History is session-only unless you download it — reloading the page or closing the tab clears it. |
+| I want to check both a message and a posting from the same company | Run them as two separate checks — switch modes between them. Both will show up in history, tagged so you can tell them apart. |
+| A reverse-image-search or text-duplication link didn't turn anything up | These are pointers to external tools, not built-in automated checks — the tool can't run them for you, since that would mean sending your data somewhere outside your browser. |
