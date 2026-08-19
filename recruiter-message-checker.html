@@ -797,21 +797,22 @@ const messageChecks = [
   { id:'newProfile', label:'Profile was created recently (within the last 6 months)', weight:10 },
   { id:'fewConnections', label:'Fewer than ~50 connections', weight:10 },
   { id:'noBadge', label:'No verification badge (ID, employer, or Clear/Entra verification)', weight:5 },
+  { id:'noMutuals', label:'Few or no mutual connections in your industry', weight:8 },
+  { id:'noActivity', label:'Little to no posting or comment history', weight:7 },
+  { id:'noContactInfo', label:'Actual message does not list: email or phone number or job title', weight:15 },
   { id:'unrelatedProfession', label:'Sender\u2019s headline/profession has nothing to do with recruiting or the pitch (e.g. a nurse or engineer suddenly offering an unrelated "project")', weight:20 },
   { id:'genericAiPhoto', label:'Profile photo looks AI-generated, stock, or oddly generic on closer look (asymmetric features, warped background, too-perfect skin)', weight:15, optional:true,
     links:[
       {text:'Is It AI?', url:'https://isitai.com/ai-image-detector'},
       {text:'Quillbot AI Image Detector', url:'https://quillbot.com/ai-image-detector'}
     ] },
+  { id:'notListed', label:'Not listed as an employee on the company\u2019s own LinkedIn page', weight:25 },
   { id:'stockPhoto', label:'Reverse image search shows the photo used elsewhere / on a stock site', weight:25, optional:true,
     links:[
       {text:'Google Images', url:'https://images.google.com/'},
       {text:'TinEye', url:'https://tineye.com/'},
       {text:'Bing Visual Search', url:'https://www.bing.com/visualsearch'}
     ] },
-  { id:'notListed', label:'Not listed as an employee on the company\u2019s own LinkedIn page', weight:25 },
-  { id:'noMutuals', label:'Few or no mutual connections in your industry', weight:8 },
-  { id:'noActivity', label:'Little to no posting or comment history', weight:7 },
 ];
 
 function renderChecklist(checks, containerEl){
@@ -1368,8 +1369,10 @@ function renderReport(mode, score, flags, text, matchRanges, company, matchedIds
   let verdictText, verdictClass, barColor;
   if(score >= 55){
     verdictText = 'High risk'; verdictClass = 'red'; barColor = 'var(--red)';
+  } else if(score >= 40){
+    verdictText = 'Elevated caution — verify before proceeding'; verdictClass = 'amber'; barColor = 'var(--amber)';
   } else if(score >= 25){
-    verdictText = 'Proceed with caution'; verdictClass = 'amber'; barColor = 'var(--amber)';
+    verdictText = 'Some caution — verify details'; verdictClass = 'amber'; barColor = 'var(--amber)';
   } else {
     verdictText = 'Low signal detected'; verdictClass = 'green'; barColor = 'var(--green)';
   }
